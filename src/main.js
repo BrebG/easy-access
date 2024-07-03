@@ -2,44 +2,31 @@ import kaboom from "kaboom"
 
 kaboom()
 
-loadSprite("bean", "sprites/bean.png")
+const SPEED = 320
 
-setGravity(1600)
-const bean = add([
-	sprite("bean"),
-	pos(80, 40),
-	area(),
-	body(),
-])
+loadSprite("bean", "/sprites/bean.png")
 
-onKeyPress("space", () => {
-	if (bean.isGrounded()) {
-		bean.jump();
+scene("game", () => {
+	const player = add([
+		sprite("bean"),
+		pos(100, 200),
+		area(),
+		body(),
+		"player",
+	])
+
+	const dirs = {
+		"left": LEFT,
+		"right": RIGHT,
+		"up": UP,
+		"down": DOWN,
+	}
+
+	for (const dir in dirs) {
+		onKeyDown(dir, () => {
+			player.move(dirs[dir].scale(SPEED))
+		})
 	}
 })
-add([
-	rect(width(), 48),
-	pos(0, height() - 48),
-	outline(4),
-	area(),
-	body({ isStatic: true }),
-	color(127, 200, 255),
-])
 
-loop(1, () => {
-	add([
-		rect(48, 64),
-		area(),
-		outline(4),
-		pos(width(), height() - 48),
-		anchor("botleft"),
-		color(255, 180, 255),
-		move(LEFT, 240),
-		"tree",
-	]);
-})
-
-bean.onCollide("tree", () => {
-	addKaboom(bean.pos);
-	shake();
-})
+go("game")
