@@ -3,7 +3,8 @@ import kaboom from "kaboom";
 kaboom();
 
 loadSprite("pedestrian", "sprites/bean.png");
-loadSprite("player", "sprites/player.png");
+loadSprite("player", "sprites/hero.png");
+loadSprite("grass", "sprites/grass.png");
 
 let SPEED = 480;
 
@@ -30,38 +31,40 @@ function createPedestrian(x, y) {
 	});
 }
 
-loop(1, () => {
-	createPedestrian(rand(0, width()), rand(0, height()));
-});
+export default mazeScene = () => {
+	scene("maze", () => {
+		add([sprite("grass", { width: width("100vw"), height: height("100vh") })]);
 
-const player = add([sprite("player"), pos(80, 40), area(), "player"]);
+		loop(1, () => {
+			createPedestrian(rand(0, width()), rand(0, height()));
+		});
 
-player.onCollideUpdate("pedestrian", () => {
-	SPEED = 200;
-});
+		const player = add([sprite("player"), pos(80, 40), area(), "player"]);
 
-player.onCollideEnd("pedestrian", () => {
-	SPEED = 480;
-});
+		player.onCollideUpdate("pedestrian", () => {
+			SPEED = 200;
+		});
 
-// player.onGround(() => {
-// 	debug.log("ouch");
-// });
+		player.onCollideEnd("pedestrian", () => {
+			SPEED = 480;
+		});
 
-onKeyDown("left", () => {
-	player.move(-SPEED, 0);
-});
+		onKeyDown("left", () => {
+			player.move(-SPEED, 0);
+		});
 
-onKeyDown("right", () => {
-	player.move(SPEED, 0);
-});
+		onKeyDown("right", () => {
+			player.move(SPEED, 0);
+		});
 
-onKeyDown("up", () => {
-	player.move(0, -SPEED);
-});
+		onKeyDown("up", () => {
+			player.move(0, -SPEED);
+		});
 
-onKeyDown("down", () => {
-	player.move(0, SPEED);
-});
+		onKeyDown("down", () => {
+			player.move(0, SPEED);
+		});
+	});
+};
 
-// debug.inspect = true;
+mazeScene();

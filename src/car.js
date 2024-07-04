@@ -2,8 +2,10 @@ import kaboom from "kaboom";
 
 kaboom();
 
-loadSprite("car", "sprites/bean.png");
+loadSprite("car", "sprites/voiture1.png");
+loadSprite("car2", "sprites/voiture2.png");
 loadSprite("player", "sprites/player.png");
+loadSprite("metal", "sprites/metal.png");
 
 let SPEED = 480;
 
@@ -21,19 +23,17 @@ function spawnFirstCar() {
 	]);
 	wait(rand(1, 4), spawnFirstCar);
 }
-spawnFirstCar();
 function spawnSecondCar() {
 	add([
-		sprite("car"),
+		sprite("car2"),
 		pos(1920, 400),
 		area(),
 		body(),
 		move(vec2(-1, 0), carSpeed),
-		"car",
+		"car2",
 	]);
 	wait(rand(1, 4), spawnSecondCar);
 }
-spawnSecondCar();
 function spawnThirdCar() {
 	add([
 		sprite("car"),
@@ -45,7 +45,6 @@ function spawnThirdCar() {
 	]);
 	wait(rand(1, 4), spawnThirdCar);
 }
-spawnThirdCar();
 function spawnFourthCar() {
 	add([
 		sprite("car"),
@@ -57,27 +56,49 @@ function spawnFourthCar() {
 	]);
 	wait(rand(1, 4), spawnFourthCar);
 }
-spawnFourthCar();
 
-const player = add([sprite("player"), pos(80, 40), area(), "player"]);
+export default carScene = () => {
+	scene("car", () => {
+		spawnFirstCar();
+		spawnSecondCar();
+		spawnThirdCar();
+		spawnFourthCar();
 
-player.onCollide("car", () => {
-	burp();
-	addKaboom(player.pos);
-});
+		const player = add([sprite("player"), pos(80, 40), area(), "player"]);
+		const metal = add([
+			sprite("metal"),
+			pos(1700, 800),
+			area(),
+			body(),
+			"metal",
+		]);
 
-onKeyDown("left", () => {
-	player.move(-SPEED, 0);
-});
+		player.onCollide("metal", () => {
+			go("maze");
+		});
 
-onKeyDown("right", () => {
-	player.move(SPEED, 0);
-});
+		player.onCollide("car", () => {
+			burp();
+			addKaboom(player.pos);
+			go("car");
+		});
 
-onKeyDown("up", () => {
-	player.move(0, -SPEED);
-});
+		onKeyDown("left", () => {
+			player.move(-SPEED, 0);
+		});
 
-onKeyDown("down", () => {
-	player.move(0, SPEED);
-});
+		onKeyDown("right", () => {
+			player.move(SPEED, 0);
+		});
+
+		onKeyDown("up", () => {
+			player.move(0, -SPEED);
+		});
+
+		onKeyDown("down", () => {
+			player.move(0, SPEED);
+		});
+	});
+	go("car");
+};
+carScene();
