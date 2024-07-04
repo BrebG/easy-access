@@ -286,7 +286,7 @@ scene("flat", (levelIdx) => {
 		}
 	});
 });
-go("flat", 0);
+// go("flat", 0);
 
 const carSpeed = 200;
 const carDirection = vec2(1, 0);
@@ -441,3 +441,37 @@ scene("park", () => {
 		player.move(0, SPEED);
 	});
 });
+
+scene("start", () => {
+	onUpdate(() => setCursor("default"));
+
+	function addButton(txt, p, f) {
+		const btn = add([
+			rect(240, 80, { radius: 8 }),
+			pos(p),
+			area(),
+			scale(1),
+			anchor("center"),
+			outline(4),
+		]);
+		btn.add([text(txt), anchor("center"), color(0, 0, 0)]);
+
+		btn.onHoverUpdate(() => {
+			const t = time() * 10;
+			btn.scale = vec2(1.2);
+			setCursor("pointer");
+		});
+		btn.onHoverEnd(() => {
+			btn.scale = vec2(1);
+			btn.color = rgb();
+		});
+
+		return btn;
+	}
+
+	const startButton = addButton("Start", vec2(width() / 2, height() / 2));
+
+	startButton.onClick(() => go("flat", 0));
+});
+
+go("start");
