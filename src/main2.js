@@ -4,7 +4,7 @@ import kaboom from "kaboom";
 kaboom({ background: [0, 0, 0] });
 
 // Constants
-let SPEED = 320;
+const SPEED = 320;
 
 // Load assets
 loadSprite("bed", "/sprites/bed.png");
@@ -70,7 +70,6 @@ scene("flat", (levelIdx) => {
 				area(),
 				body({ isStatic: true }),
 				anchor("center"),
-				"door",
 			],
 		},
 	});
@@ -133,7 +132,7 @@ scene("flat", (levelIdx) => {
 
 	const player = add([
 		sprite("heroDown", { width: 64, height: 100 }),
-		pos(100, 100),
+		pos(500, 350),
 		area(),
 		body(),
 		"player",
@@ -262,7 +261,7 @@ scene("flat", (levelIdx) => {
 	});
 
 	player.onCollide("door", () => {
-		go("car");
+		go("park");
 	});
 
 	// Toggle light
