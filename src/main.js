@@ -32,6 +32,7 @@ loadSprite("metal", "sprites/metal.png");
 loadSprite("pedestrian", "sprites/bean.png");
 loadSprite("grass", "sprites/grass.png");
 loadSprite("road", "sprites/road.jpg");
+loadSprite("parquet", "sprites/parquet.png");
 
 scene("flat", (levelIdx) => {
   const levels = [
@@ -443,24 +444,27 @@ scene("park", () => {
 });
 
 scene("maze", () => {
+  add([sprite("parquet", { width: width("100vw"), height: height("100vh") })]);
   addLevel(
     [
-      "yyyyyyyyyyyyyyyyyyyyyyy",
-      "y     y   H     y y y y",
-      "y yyyyyyy yyyyy y y y y",
-      "y       H y y   H     y",
-      "yyyyyyyyy y yyyyyyyyyHy",
-      "y           y         y",
-      "yHyyyyyyyyyyy yyyyyyyyy",
-      "y y   y   y     y   y D",
-      "y yyyyyyy y yyy  yyyy y",
-      "y y        Hy   y     y",
-      "D yyyyyyyyy yyy y yyyyy",
-      "y y   y   y y   y   y y",
-      "yyyyy y yyy yyy yyy y y",
-      "y           y   H     y",
-      "yyyyyyyyyyyyyyyyyyyyyyy",
+      "                           ",
+      "    yyyyyyyyyyyyyyyyyyyyyyy",
+      "    y     y   H     y y y y",
+      "    y yyyyyyy yyyyy y y y y",
+      "    y       H y y   H     y",
+      "    yyyyyyyyy y yyyyyyyyyHy",
+      "    y           y         y",
+      "    yHyyyyyyyyyyy yyyyyyyyy",
+      "    y y   y   y     y   y D",
+      "    y yyyyyyy y yyy  yyyy y",
+      "    y y        Hy   y     y",
+      "    D yyyyyyyyy yyy y yyyyy",
+      "    y y   y   y y   y   y y",
+      "    y yyy y yyy yyy yyy y y",
+      "    y           y   H     y",
+      "    yyyyyyyyyyyyyyyyyyyyyyy",
     ],
+
     {
       tileWidth: 64,
       tileHeight: 64,
@@ -488,11 +492,12 @@ scene("maze", () => {
       },
     }
   );
-  // Player
+  // Playerconst levelWidth = levels[0].length * 64; // Largeur du niveau en pixels
+  // Hauteur du niveau en pixels
 
   const player = add([
     sprite("heroDown", { width: 48, height: 50 }),
-    pos(1350, 380),
+    pos(1580, 480),
     area(),
     body(),
     "player",
