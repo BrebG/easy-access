@@ -32,22 +32,22 @@ loadSprite("grass", "sprites/grass.png");
 loadSprite("road", "sprites/road.jpg");
 loadSprite("pedestrian", "sprites/bean.png")
 
-scene("flat", (levelIdx) => {
+scene("flat", () => {
 	const levels = [
-		[
-			"xxxxxxxxxx",
-			"x___x____x",
-			"x___x____x",
-			"x___x____x",
-			"xx_xx____x",
-			"x________x",
-			"x________x",
-			"x________x",
-			"xx|xxxxxxx",
-		],
+
+		"xxxxxxxxxx",
+		"x___x____x",
+		"x___x____x",
+		"x___x____x",
+		"xx_xx____x",
+		"x________x",
+		"x________x",
+		"x________x",
+		"xx|xxxxxxx",
+
 	];
 
-	const level = addLevel(levels[levelIdx], {
+	const level = addLevel(levels, {
 		tileWidth: 64,
 		tileHeight: 64,
 		pos: vec2(0, 0),
@@ -285,8 +285,6 @@ scene("flat", (levelIdx) => {
 	});
 });
 
-go("flat", 0);
-
 const carSpeed = 200;
 const carDirection = vec2(1, 0);
 
@@ -496,3 +494,166 @@ scene("park", () => {
 		player.move(0, SPEED);
 	});
 });
+
+scene("office", () => {
+
+	loadSprite("officeWall", "/sprites/officeWall.png");
+	loadSprite("officeFloor", "/sprites/officeFloor.png");
+
+	const levels = [
+
+		"pxxxxxxpxxxxxxxxxp",
+		"p______p_________p",
+		"p______p_________p",
+		"p______p_________p",
+		"p______p_________p",
+		"pxx_xxxx_________p",
+		"p________________p",
+		"p________________p",
+		"p________________p",
+		"p________________p",
+		"p________________p",
+		"p________________p",
+		"p________________p",
+		"p________________p",
+		"xx|xxxxxxxxxxxxxxx",
+
+	];
+
+	const level = addLevel(levels, {
+		tileWidth: 64,
+		tileHeight: 64,
+		pos: vec2(0, 0),
+
+		tiles: {
+			"x": () => [
+				sprite("officeWall", { width: 64, height: 64 }),
+				area(),
+				body({ isStatic: true }),
+				anchor("center"),
+			],
+			"p": () => [
+				sprite("brickWall", { width: 64, height: 64 }),
+				area(),
+				body({ isStatic: true }),
+				anchor("center"),
+			],
+			"_": () => [
+				sprite("officeFloor", { width: 64, height: 64 }),
+				area(),
+				anchor("center"),
+			],
+			"|": () => [
+				sprite("door", { width: 64, height: 64 }),
+				area(),
+				body({ isStatic: true }),
+				anchor("center"),
+				"door",
+			],
+		},
+	});
+
+	const player = add([
+		sprite("heroDown", { width: 48, height: 64 }),
+		pos(100, 100),
+		area(),
+		body(),
+		"player",
+	]);
+
+
+	onKeyDown("left", () => {
+		player.move(-SPEED, 0);
+	});
+
+	onKeyDown("right", () => {
+		player.move(SPEED, 0);
+	});
+
+	onKeyDown("up", () => {
+		player.move(0, -SPEED);
+	});
+
+	onKeyDown("down", () => {
+		player.move(0, SPEED);
+	});
+
+	player.onUpdate(() => {
+		camPos(player.pos);
+	});
+
+	loadSprite("doorOpen", "/sprites/doorOpen.png");
+
+	const doorOpen = add([
+		sprite("doorOpen", { width: 64, height: 64 }),
+		pos(160, 290),
+		area(),
+		"doorOpen",
+	]);
+
+	loadSprite("windowDouble", "/sprites/windowDouble.png");
+
+	const windowDouble = add([
+		sprite("windowDouble", { width: 140, height: 50 }),
+		pos(155, -35),
+		area(),
+		body({ isStatic: true }),
+		"windowDouble",
+	]);
+
+	loadSprite("table", "/sprites/table.png");
+
+	const table = add([
+		sprite("table", { width: 128, height: 64 }),
+		pos(160, 80),
+		area(),
+		body({ isStatic: true }),
+		"table",
+	]);
+
+	loadSprite("officeArmchair", "/sprites/officeArmchair.png");
+
+	const officeArmchair = add([
+		sprite("officeArmchair", { width: 64, height: 64 }),
+		pos(160, 30),
+		area(),
+		body({ isStatic: true }),
+		"officeArmchair",
+	]);
+
+})
+
+
+scene("start", () => {
+	onUpdate(() => setCursor("default"));
+
+	function addButton(txt, p, f) {
+		const btn = add([
+			rect(240, 80, { radius: 8 }),
+			pos(p),
+			area(),
+			scale(1),
+			anchor("center"),
+			outline(4),
+		]);
+		btn.add([text(txt), anchor("center"), color(0, 0, 0)]);
+
+		btn.onHoverUpdate(() => {
+			const t = time() * 10;
+			btn.scale = vec2(1.2);
+			setCursor("pointer");
+		});
+		btn.onHoverEnd(() => {
+			btn.scale = vec2(1);
+			btn.color = rgb();
+		});
+
+		return btn;
+	}
+
+	const startButton = addButton("Start", vec2(width() / 2, height() / 2));
+
+	startButton.onClick(() => go("office"));
+});
+
+go("start");
