@@ -156,6 +156,89 @@ scene("flat", (levelIdx) => {
     player.move(0, -SPEED);
   });
 
+  const bed = add([
+    sprite("bed", { width: 64, height: 64 }),
+    pos(95, 38),
+    area(),
+    body({ isStatic: true }),
+    "bed",
+  ]);
+  const table = add([
+    sprite("table", { width: 64, height: 64 }),
+    pos(400, 200),
+    area(),
+    body({ isStatic: true }),
+    "table",
+  ]);
+  const kitchen = add([
+    sprite("kitchen", { width: 180, height: 86 }),
+    pos(360, 10),
+    area(),
+    body({ isStatic: true }),
+    "kitchen",
+  ]);
+  const tableFlower = add([
+    sprite("tableFlower", { width: 24, height: 42 }),
+    pos(65, 25),
+    area(),
+    body({ isStatic: true }),
+    "tableFlower",
+  ]);
+  const doorOpen = add([
+    sprite("doorOpen", { width: 64, height: 64 }),
+    pos(96, 225),
+    area(),
+    "doorOpen",
+  ]);
+  const plantDeco = add([
+    sprite("plantDeco", { width: 64, height: 64 }),
+    pos(290, 25),
+    area(),
+    body({ isStatic: true }),
+    "plantDeco",
+  ]);
+  const closet = add([
+    sprite("closet", { width: 64, height: 46 }),
+    pos(160, 30),
+    area(),
+    body({ isStatic: true }),
+    "closet",
+  ]);
+  const windowDouble = add([
+    sprite("windowDouble", { width: 80, height: 55 }),
+    pos(366, -27),
+    area(),
+    body({ isStatic: true }),
+    "windowDouble",
+  ]);
+  const window = add([
+    sprite("window", { width: 46, height: 50 }),
+    pos(103, -27),
+    area(),
+    body({ isStatic: true }),
+    "window",
+  ]);
+  const clockWide = add([
+    sprite("clockWide", { width: 72, height: 72 }),
+    pos(225, 230),
+    area(),
+    "clockWide",
+  ]);
+  // Dialog
+  const dialog = addDialog();
+  // Camera setup
+  player.onUpdate(() => {
+    camPos(player.pos);
+  });
+
+  // Light switch
+  const lightSwitch = add([
+    sprite("light_switch"),
+    pos(170, 450),
+    area(),
+    "light_switch",
+  ]);
+
   // Player collisions interactions
   player.onCollide("light_switch", () => {
     dialog.say("You found a light switch ! Press 'E' to activate");
