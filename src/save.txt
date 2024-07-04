@@ -447,9 +447,9 @@ scene("maze", () => {
     [
       "yyyyyyyyyyyyyyyyyyyyyyy",
       "y     y   H     y y y y",
-      "y yyyyyyy yyyyy y y y y",
+      "y yyyyyyy y yyy y y y y",
       "y       H y y   H     y",
-      "yyyyyyyyy y yyyyyyyyyHy",
+      "yyyyyyyyy yyyyyyyyyyyHy",
       "y           y         y",
       "yHyyyyyyyyyyy yyyyyyyyy",
       "y y   y   y     y   y D",
@@ -491,7 +491,7 @@ scene("maze", () => {
   // Player
 
   const player = add([
-    sprite("heroDown", { width: 48, height: 50 }),
+    sprite("heroDown", { width: 64, height: 100 }),
     pos(1350, 380),
     area(),
     body(),
@@ -504,22 +504,22 @@ scene("maze", () => {
   loadSprite("heroDown", "/sprites/heroDown.png");
 
   onKeyDown("right", () => {
-    player.use(sprite("heroRight", { width: 40, height: 62 }));
+    player.use(sprite("heroRight", { width: 32, height: 50 }));
     player.move(SPEED, 0);
   });
 
   onKeyDown("left", () => {
-    player.use(sprite("heroLeft", { width: 40, height: 62 }));
+    player.use(sprite("heroLeft", { width: 32, height: 50 }));
     player.move(-SPEED, 0);
   });
 
   onKeyDown("down", () => {
-    player.use(sprite("heroDown", { width: 40, height: 62 }));
+    player.use(sprite("heroDown", { width: 32, height: 50 }));
     player.move(0, SPEED);
   });
 
   onKeyDown("up", () => {
-    player.use(sprite("heroUp", { width: 40, height: 62 }));
+    player.use(sprite("heroUp", { width: 32, height: 50 }));
     player.move(0, -SPEED);
   });
 });
