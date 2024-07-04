@@ -4,7 +4,7 @@ import kaboom from "kaboom";
 kaboom({ background: [0, 0, 0] });
 
 // Constants
-let SPEED = 320;
+const SPEED = 320;
 
 // Load assets
 loadSprite("bed", "/sprites/bed.png");
@@ -27,10 +27,11 @@ loadSprite("bg", "/sprites/parquet.png");
 loadSprite("brickWall", "/sprites/brickWall.jpg");
 loadSprite("car", "sprites/voiture1.png");
 loadSprite("car2", "sprites/voiture2.png");
+loadSprite("player", "sprites/player.png");
 loadSprite("metal", "sprites/metal.png");
+loadSprite("pedestrian", "sprites/bean.png");
 loadSprite("grass", "sprites/grass.png");
 loadSprite("road", "sprites/road.jpg");
-loadSprite("pedestrian", "sprites/bean.png")
 
 scene("flat", (levelIdx) => {
 	const levels = [
@@ -53,13 +54,13 @@ scene("flat", (levelIdx) => {
 		pos: vec2(0, 0),
 
 		tiles: {
-			"x": () => [
+			x: () => [
 				sprite("brickWall", { width: 64, height: 64 }),
 				area(),
 				body({ isStatic: true }),
 				anchor("center"),
 			],
-			"_": () => [
+			_: () => [
 				sprite("bg", { width: 64, height: 64 }),
 				area(),
 				anchor("center"),
@@ -69,7 +70,6 @@ scene("flat", (levelIdx) => {
 				area(),
 				body({ isStatic: true }),
 				anchor("center"),
-				"door",
 			],
 		},
 	});
@@ -77,6 +77,7 @@ scene("flat", (levelIdx) => {
 	// Game state
 	let isLightOn = true;
 	let canToggleLight = false;
+	let canTakeElevator = false;
 	let blackScreen = null;
 
 	function addDialog() {
@@ -130,30 +131,35 @@ scene("flat", (levelIdx) => {
 	// Player
 
 	const player = add([
-		sprite("heroDown", { width: 48, height: 64 }),
-		pos(100, 100),
+		sprite("heroDown", { width: 64, height: 100 }),
+		pos(500, 350),
 		area(),
 		body(),
 		"player",
 	]);
 
+	loadSprite("heroUp", "/sprites/heroUp.png");
+	loadSprite("heroRight", "/sprites/heroRight.png");
+	loadSprite("heroLeft", "/sprites/heroLeft.png");
+	loadSprite("heroDown", "/sprites/heroDown.png");
+
 	onKeyDown("right", () => {
-		player.use(sprite("heroRight", { width: 48, height: 64 }));
+		player.use(sprite("heroRight", { width: 64, height: 100 }));
 		player.move(SPEED, 0);
 	});
 
 	onKeyDown("left", () => {
-		player.use(sprite("heroLeft", { width: 48, height: 64 }));
+		player.use(sprite("heroLeft", { width: 64, height: 100 }));
 		player.move(-SPEED, 0);
 	});
 
 	onKeyDown("down", () => {
-		player.use(sprite("heroDown", { width: 40, height: 64 }));
+		player.use(sprite("heroDown", { width: 64, height: 100 }));
 		player.move(0, SPEED);
 	});
 
 	onKeyDown("up", () => {
-		player.use(sprite("heroUp", { width: 40, height: 64 }));
+		player.use(sprite("heroUp", { width: 64, height: 100 }));
 		player.move(0, -SPEED);
 	});
 
@@ -225,6 +231,13 @@ scene("flat", (levelIdx) => {
 		area(),
 		"clockWide",
 	]);
+	// Dialog
+	const dialog = addDialog();
+	// Camera setup
+	player.onUpdate(() => {
+		camPos(player.pos);
+	});
+
 	// Light switch
 	const lightSwitch = add([
 		sprite("light_switch"),
@@ -233,13 +246,6 @@ scene("flat", (levelIdx) => {
 		"light_switch",
 	]);
 
-	// Camera setup
-	player.onUpdate(() => {
-		camPos(player.pos);
-	});
-	// Dialog
-	const dialog = addDialog();
-
 	// Player collisions interactions
 	player.onCollide("light_switch", () => {
 		dialog.say("You found a light switch ! Press 'E' to activate");
@@ -247,7 +253,6 @@ scene("flat", (levelIdx) => {
 	});
 
 	player.onCollideEnd("light_switch", () => {
-		dialog.dismiss();
 		canToggleLight = false;
 	});
 
@@ -255,12 +260,8 @@ scene("flat", (levelIdx) => {
 		dialog.say("It's 1.30pm");
 	});
 
-	player.onCollideEnd("clockWide", () => {
-		dialog.dismiss();
-	});
-
 	player.onCollide("door", () => {
-		go("car");
+		go("park");
 	});
 
 	// Toggle light
@@ -284,7 +285,6 @@ scene("flat", (levelIdx) => {
 		}
 	});
 });
-
 go("flat", 0);
 
 const carSpeed = 200;
@@ -366,36 +366,8 @@ scene("car", () => {
 	spawnThirdCar();
 	spawnFourthCar();
 
-	// Player
-
-	const player = add([
-		sprite("heroDown", { width: 48, height: 64 }),
-		pos(100, 100),
-		area(),
-		body(),
-		"player",
-	]);
-
-	onKeyDown("right", () => {
-		player.use(sprite("heroRight", { width: 48, height: 64 }));
-		player.move(SPEED, 0);
-	});
-
-	onKeyDown("left", () => {
-		player.use(sprite("heroLeft", { width: 48, height: 64 }));
-		player.move(-SPEED, 0);
-	});
-
-	onKeyDown("down", () => {
-		player.use(sprite("heroDown", { width: 40, height: 64 }));
-		player.move(0, SPEED);
-	});
-
-	onKeyDown("up", () => {
-		player.use(sprite("heroUp", { width: 40, height: 64 }));
-		player.move(0, -SPEED);
-	});
-	const metal = add([sprite("metal"), pos(width("100vw") - 200, (height("100vh") - 200)), area(), body(), "metal"]);
+	const player = add([sprite("player"), pos(80, 40), area(), "player"]);
+	const metal = add([sprite("metal"), pos(1700, 800), area(), body(), "metal"]);
 
 	player.onCollide("metal", () => {
 		go("park");
@@ -431,35 +403,7 @@ scene("park", () => {
 		createPedestrian(rand(0, width()), rand(0, height()));
 	});
 
-	// Player
-
-	const player = add([
-		sprite("heroDown", { width: 48, height: 64 }),
-		pos(100, 100),
-		area(),
-		body(),
-		"player",
-	]);
-
-	onKeyDown("right", () => {
-		player.use(sprite("heroRight", { width: 48, height: 64 }));
-		player.move(SPEED, 0);
-	});
-
-	onKeyDown("left", () => {
-		player.use(sprite("heroLeft", { width: 48, height: 64 }));
-		player.move(-SPEED, 0);
-	});
-
-	onKeyDown("down", () => {
-		player.use(sprite("heroDown", { width: 40, height: 64 }));
-		player.move(0, SPEED);
-	});
-
-	onKeyDown("up", () => {
-		player.use(sprite("heroUp", { width: 40, height: 64 }));
-		player.move(0, -SPEED);
-	});
+	const player = add([sprite("player"), pos(70, 800), area(), "player"]);
 	const metal = add([
 		sprite("metal"),
 		pos(1750, 90),
