@@ -27,40 +27,39 @@ loadSprite("bg", "/sprites/parquet.png");
 loadSprite("brickWall", "/sprites/brickWall.jpg");
 loadSprite("car", "sprites/voiture1.png");
 loadSprite("car2", "sprites/voiture2.png");
-loadSprite("player", "sprites/player.png");
 loadSprite("metal", "sprites/metal.png");
-loadSprite("pedestrian", "sprites/bean.png");
 loadSprite("grass", "sprites/grass.png");
 loadSprite("road", "sprites/road.jpg");
+loadSprite("pedestrian", "sprites/bean.png")
 
-scene("flat", (levelIdx) => {
+scene("flat", () => {
 	const levels = [
-		[
-			"xxxxxxxxxx",
-			"x___x____x",
-			"x___x____x",
-			"x___x____x",
-			"xx_xx____x",
-			"x________x",
-			"x________x",
-			"x________x",
-			"xx|xxxxxxx",
-		],
+
+		"xxxxxxxxxx",
+		"x___x____x",
+		"x___x____x",
+		"x___x____x",
+		"xx_xx____x",
+		"x________x",
+		"x________x",
+		"x________x",
+		"xx|xxxxxxx",
+
 	];
 
-	const level = addLevel(levels[levelIdx], {
+	const level = addLevel(levels, {
 		tileWidth: 64,
 		tileHeight: 64,
 		pos: vec2(0, 0),
 
 		tiles: {
-			x: () => [
+			"x": () => [
 				sprite("brickWall", { width: 64, height: 64 }),
 				area(),
 				body({ isStatic: true }),
 				anchor("center"),
 			],
-			_: () => [
+			"_": () => [
 				sprite("bg", { width: 64, height: 64 }),
 				area(),
 				anchor("center"),
@@ -78,7 +77,6 @@ scene("flat", (levelIdx) => {
 	// Game state
 	let isLightOn = true;
 	let canToggleLight = false;
-	let canTakeElevator = false;
 	let blackScreen = null;
 
 	function addDialog() {
@@ -132,35 +130,30 @@ scene("flat", (levelIdx) => {
 	// Player
 
 	const player = add([
-		sprite("heroDown", { width: 64, height: 100 }),
+		sprite("heroDown", { width: 48, height: 64 }),
 		pos(100, 100),
 		area(),
 		body(),
 		"player",
 	]);
 
-	loadSprite("heroUp", "/sprites/heroUp.png");
-	loadSprite("heroRight", "/sprites/heroRight.png");
-	loadSprite("heroLeft", "/sprites/heroLeft.png");
-	loadSprite("heroDown", "/sprites/heroDown.png");
-
 	onKeyDown("right", () => {
-		player.use(sprite("heroRight", { width: 64, height: 100 }));
+		player.use(sprite("heroRight", { width: 48, height: 64 }));
 		player.move(SPEED, 0);
 	});
 
 	onKeyDown("left", () => {
-		player.use(sprite("heroLeft", { width: 64, height: 100 }));
+		player.use(sprite("heroLeft", { width: 48, height: 64 }));
 		player.move(-SPEED, 0);
 	});
 
 	onKeyDown("down", () => {
-		player.use(sprite("heroDown", { width: 64, height: 100 }));
+		player.use(sprite("heroDown", { width: 40, height: 64 }));
 		player.move(0, SPEED);
 	});
 
 	onKeyDown("up", () => {
-		player.use(sprite("heroUp", { width: 64, height: 100 }));
+		player.use(sprite("heroUp", { width: 40, height: 64 }));
 		player.move(0, -SPEED);
 	});
 
@@ -232,13 +225,6 @@ scene("flat", (levelIdx) => {
 		area(),
 		"clockWide",
 	]);
-	// Dialog
-	const dialog = addDialog();
-	// Camera setup
-	player.onUpdate(() => {
-		camPos(player.pos);
-	});
-
 	// Light switch
 	const lightSwitch = add([
 		sprite("light_switch"),
@@ -247,6 +233,13 @@ scene("flat", (levelIdx) => {
 		"light_switch",
 	]);
 
+	// Camera setup
+	player.onUpdate(() => {
+		camPos(player.pos);
+	});
+	// Dialog
+	const dialog = addDialog();
+
 	// Player collisions interactions
 	player.onCollide("light_switch", () => {
 		dialog.say("You found a light switch ! Press 'E' to activate");
@@ -254,11 +247,16 @@ scene("flat", (levelIdx) => {
 	});
 
 	player.onCollideEnd("light_switch", () => {
+		dialog.dismiss();
 		canToggleLight = false;
 	});
 
 	player.onCollide("clockWide", () => {
 		dialog.say("It's 1.30pm");
+	});
+
+	player.onCollideEnd("clockWide", () => {
+		dialog.dismiss();
 	});
 
 	player.onCollide("door", () => {
@@ -286,7 +284,6 @@ scene("flat", (levelIdx) => {
 		}
 	});
 });
-// go("flat", 0);
 
 const carSpeed = 200;
 const carDirection = vec2(1, 0);
@@ -367,8 +364,36 @@ scene("car", () => {
 	spawnThirdCar();
 	spawnFourthCar();
 
-	const player = add([sprite("player"), pos(80, 40), area(), "player"]);
-	const metal = add([sprite("metal"), pos(1700, 800), area(), body(), "metal"]);
+	// Player
+
+	const player = add([
+		sprite("heroDown", { width: 48, height: 64 }),
+		pos(100, 100),
+		area(),
+		body(),
+		"player",
+	]);
+
+	onKeyDown("right", () => {
+		player.use(sprite("heroRight", { width: 48, height: 64 }));
+		player.move(SPEED, 0);
+	});
+
+	onKeyDown("left", () => {
+		player.use(sprite("heroLeft", { width: 48, height: 64 }));
+		player.move(-SPEED, 0);
+	});
+
+	onKeyDown("down", () => {
+		player.use(sprite("heroDown", { width: 40, height: 64 }));
+		player.move(0, SPEED);
+	});
+
+	onKeyDown("up", () => {
+		player.use(sprite("heroUp", { width: 40, height: 64 }));
+		player.move(0, -SPEED);
+	});
+	const metal = add([sprite("metal"), pos(width("100vw") - 200, (height("100vh") - 200)), area(), body(), "metal"]);
 
 	player.onCollide("metal", () => {
 		go("park");
@@ -404,7 +429,35 @@ scene("park", () => {
 		createPedestrian(rand(0, width()), rand(0, height()));
 	});
 
-	const player = add([sprite("player"), pos(70, 800), area(), "player"]);
+	// Player
+
+	const player = add([
+		sprite("heroDown", { width: 48, height: 64 }),
+		pos(100, 100),
+		area(),
+		body(),
+		"player",
+	]);
+
+	onKeyDown("right", () => {
+		player.use(sprite("heroRight", { width: 48, height: 64 }));
+		player.move(SPEED, 0);
+	});
+
+	onKeyDown("left", () => {
+		player.use(sprite("heroLeft", { width: 48, height: 64 }));
+		player.move(-SPEED, 0);
+	});
+
+	onKeyDown("down", () => {
+		player.use(sprite("heroDown", { width: 40, height: 64 }));
+		player.move(0, SPEED);
+	});
+
+	onKeyDown("up", () => {
+		player.use(sprite("heroUp", { width: 40, height: 64 }));
+		player.move(0, -SPEED);
+	});
 	const metal = add([
 		sprite("metal"),
 		pos(1750, 90),
@@ -442,6 +495,135 @@ scene("park", () => {
 	});
 });
 
+scene("office", () => {
+
+	loadSprite("officeWall", "/sprites/officeWall.png");
+	loadSprite("officeFloor", "/sprites/officeFloor.png");
+
+	const levels = [
+
+		"pxxxxxxpxxxxxxxxxp",
+		"p______p_________p",
+		"p______p_________p",
+		"p______p_________p",
+		"p______p_________p",
+		"pxx_xxxx_________p",
+		"p________________p",
+		"p________________p",
+		"p________________p",
+		"p________________p",
+		"p________________p",
+		"p________________p",
+		"p________________p",
+		"p________________p",
+		"xx|xxxxxxxxxxxxxxx",
+
+	];
+
+	const level = addLevel(levels, {
+		tileWidth: 64,
+		tileHeight: 64,
+		pos: vec2(0, 0),
+
+		tiles: {
+			"x": () => [
+				sprite("officeWall", { width: 64, height: 64 }),
+				area(),
+				body({ isStatic: true }),
+				anchor("center"),
+			],
+			"p": () => [
+				sprite("brickWall", { width: 64, height: 64 }),
+				area(),
+				body({ isStatic: true }),
+				anchor("center"),
+			],
+			"_": () => [
+				sprite("officeFloor", { width: 64, height: 64 }),
+				area(),
+				anchor("center"),
+			],
+			"|": () => [
+				sprite("door", { width: 64, height: 64 }),
+				area(),
+				body({ isStatic: true }),
+				anchor("center"),
+				"door",
+			],
+		},
+	});
+
+	const player = add([
+		sprite("heroDown", { width: 48, height: 64 }),
+		pos(100, 100),
+		area(),
+		body(),
+		"player",
+	]);
+
+
+	onKeyDown("left", () => {
+		player.move(-SPEED, 0);
+	});
+
+	onKeyDown("right", () => {
+		player.move(SPEED, 0);
+	});
+
+	onKeyDown("up", () => {
+		player.move(0, -SPEED);
+	});
+
+	onKeyDown("down", () => {
+		player.move(0, SPEED);
+	});
+
+	player.onUpdate(() => {
+		camPos(player.pos);
+	});
+
+	loadSprite("doorOpen", "/sprites/doorOpen.png");
+
+	const doorOpen = add([
+		sprite("doorOpen", { width: 64, height: 64 }),
+		pos(160, 290),
+		area(),
+		"doorOpen",
+	]);
+
+	loadSprite("windowDouble", "/sprites/windowDouble.png");
+
+	const windowDouble = add([
+		sprite("windowDouble", { width: 140, height: 50 }),
+		pos(155, -35),
+		area(),
+		body({ isStatic: true }),
+		"windowDouble",
+	]);
+
+	loadSprite("table", "/sprites/table.png");
+
+	const table = add([
+		sprite("table", { width: 128, height: 64 }),
+		pos(160, 80),
+		area(),
+		body({ isStatic: true }),
+		"table",
+	]);
+
+	loadSprite("officeArmchair", "/sprites/officeArmchair.png");
+
+	const officeArmchair = add([
+		sprite("officeArmchair", { width: 64, height: 64 }),
+		pos(160, 30),
+		area(),
+		body({ isStatic: true }),
+		"officeArmchair",
+	]);
+
+})
+
+
 scene("start", () => {
 	onUpdate(() => setCursor("default"));
 
@@ -471,7 +653,7 @@ scene("start", () => {
 
 	const startButton = addButton("Start", vec2(width() / 2, height() / 2));
 
-	startButton.onClick(() => go("flat", 0));
+	startButton.onClick(() => go("office"));
 });
 
 go("start");
