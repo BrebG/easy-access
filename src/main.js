@@ -1,45 +1,42 @@
-import kaboom from "kaboom"
+import kaboom from "kaboom";
 
-kaboom()
+kaboom({ background: [0, 0, 0] });
 
-loadSprite("bean", "sprites/bean.png")
+loadSprite("metal", "/sprites/metal.png", {
+  sliceX: 2,
+  sliceY: 2,
+});
 
-setGravity(1600)
-const bean = add([
-	sprite("bean"),
-	pos(80, 40),
-	area(),
-	body(),
-])
+const levels = [
+  "===============",
+  "=          =  =",
+  "=             =",
+  "=             =",
+  "=   =         =",
+  "=             =",
+  "=             =",
+  "=             =",
+  "=             =",
+  "===============",
+];
+const tileWidth = 64;
+const tileHeight = 64;
+const levelWidth = levels[0].length * tileWidth;
+const levelHeight = levels.length * tileHeight;
+const posX = (width() - levelWidth) / 2;
+const posY = (height() - levelHeight) / 2;
 
-onKeyPress("space", () => {
-	if (bean.isGrounded()) {
-		bean.jump();
-	}
-})
-add([
-	rect(width(), 48),
-	pos(0, height() - 48),
-	outline(4),
-	area(),
-	body({ isStatic: true }),
-	color(127, 200, 255),
-])
+const level = addLevel(levels, {
+  tileWidth: 64,
+  tileHeight: 64,
+  pos: vec2(posX, posY),
 
-loop(1, () => {
-	add([
-		rect(48, 64),
-		area(),
-		outline(4),
-		pos(width(), height() - 48),
-		anchor("botleft"),
-		color(255, 180, 255),
-		move(LEFT, 240),
-		"tree",
-	]);
-})
-
-bean.onCollide("tree", () => {
-	addKaboom(bean.pos);
-	shake();
-})
+  tiles: {
+    "=": () => [
+      sprite("metal"),
+      area(),
+      body({ isStatic: true }),
+      anchor("center"),
+    ],
+  },
+});
