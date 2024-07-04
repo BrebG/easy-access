@@ -7,7 +7,7 @@ kaboom();
 const SPEED = 320;
 
 // Load assets
-loadSprite("bean", "/sprites/bean.png");
+loadSprite("hero", "/sprites/hero.png");
 loadSprite("light_switch", "https://kaboomjs.com/sprites/coin.png");
 loadSprite("bg", "/sprites/parquet.png");
 add([
@@ -106,7 +106,13 @@ const dirs = {
 };
 
 // Player
-const player = add([sprite("bean"), pos(160, 200), area(), body(), "player"]);
+const player = add([
+  sprite("hero", { width: 64, height: 100 }),
+  pos(500, 350),
+  area(),
+  body(),
+  "player",
+]);
 
 // Light switch
 const lightSwitch = add([
