@@ -264,16 +264,22 @@ loadSprite("brickWall", "/sprites/brickWall.jpg");
 loadSprite("carrelage", "/sprites/carrelage.png");
 loadSprite("hero", "/sprites/hero.png");
 loadSprite("elevator", "/sprites/elevator.png");
+loadSprite("exit", "/sprites/door.png");
+loadSprite("neighboor", "/sprites/door.png");
+loadSprite("tableFlower", "/sprites/tableFlower.png");
+loadSprite("plantDeco", "/sprites/plantDeco.png");
+loadSprite("carpet", "/sprites/carpet.png");
+loadSprite("window", "/sprites/windowDouble.png");
 
 scene("elevator1", (levelIdx) => {
   const levels = [
     [
-      "xxxxxxxxxxxxxxxx",
+      "xx1xx2xxx3xxxxxx",
       "x______________x",
+      "W______________x",
+      "W______________x",
       "x______________x",
-      "x______________x",
-      "x______________x",
-      "xxxxxxxxxxxxxxxx",
+      "xExxx4xxx5xxxxxx",
     ],
   ];
 
@@ -294,8 +300,96 @@ scene("elevator1", (levelIdx) => {
         area(),
         anchor("center"),
       ],
+      E: () => [
+        sprite("exit", { width: 64, height: 64 }),
+        area(),
+        body({ isStatic: true }),
+        anchor("center"),
+        "exit",
+      ],
+      1: () => [
+        sprite("exit", { width: 64, height: 64 }),
+        area(),
+        body({ isStatic: true }),
+        anchor("center"),
+        "neighboor1",
+      ],
+      2: () => [
+        sprite("exit", { width: 64, height: 64 }),
+        area(),
+        body({ isStatic: true }),
+        anchor("center"),
+        "neighboor2",
+      ],
+      3: () => [
+        sprite("exit", { width: 64, height: 64 }),
+        area(),
+        body({ isStatic: true }),
+        anchor("center"),
+        "neighboor3",
+      ],
+      4: () => [
+        sprite("exit", { width: 64, height: 64 }),
+        area(),
+        body({ isStatic: true }),
+        anchor("center"),
+        "neighboor4",
+      ],
+      5: () => [
+        sprite("exit", { width: 64, height: 64 }),
+        area(),
+        body({ isStatic: true }),
+        anchor("center"),
+        "neighboor5",
+      ],
+      W: () => [
+        sprite("window", { width: 64, height: 64 }),
+        area(),
+        rotate(90),
+        body({ isStatic: true }),
+        anchor("center"),
+      ],
     },
   });
+
+  const plantDeco1 = add([
+    sprite("plantDeco", { width: 64, height: 64 }),
+    pos(670, 280),
+    area(),
+    body({ isActive: true }),
+    "plantDeco",
+  ]);
+
+  const plantDeco2 = add([
+    sprite("plantDeco", { width: 64, height: 64 }),
+    pos(930, 280),
+    area(),
+    body({ isActive: true }),
+    "plantDeco",
+  ]);
+
+  const plantDeco3 = add([
+    sprite("plantDeco", { width: 64, height: 64 }),
+    pos(930, 500),
+    area(),
+    body({ isActive: true }),
+    "plantDeco",
+  ]);
+
+  const plantDeco4 = add([
+    sprite("plantDeco", { width: 64, height: 64 }),
+    pos(600, 500),
+    area(),
+    body({ isActive: true }),
+    "plantDeco",
+  ]);
+
+  const carpet = add([
+    sprite("carpet", { width: 126, height: 126 }),
+    pos(800, 350),
+    area(),
+    "carpet",
+  ]);
 
   const elevator = add([
     sprite("elevator", { width: 260, height: 160 }),
@@ -324,24 +418,45 @@ scene("elevator1", (levelIdx) => {
     down: DOWN,
   };
 
-  function addDialog() {
+  function addDialog(position) {
     const h = 220;
     const pad = 16;
+    const textOffset = 80;
     const bg = add([
-      pos(width() / 4, height() - h), // Déplace le bloc de dialogue vers la droite
-      rect(width(), h), // Réduit la largeur du bloc pour qu'il ne prenne que la moitié de l'écran
+      pos(width() / 4, height() - h),
+      rect(width(), h),
       color(0, 0, 0),
       z(100),
     ]);
     const txt = add([
       text("", {
-        width: width() / 2 - 2 * pad, // Ajuste la largeur du texte pour correspondre à la nouvelle taille du bloc
+        width: width() / 2 - 2 * pad,
       }),
-      pos(width() / 2.5 + pad, height() - h + pad), // Positionne le texte à l'intérieur du bloc de dialogue
+      pos(width() / 2.5 + pad, height() - h + pad),
       z(100),
     ]);
     bg.hidden = true;
     txt.hidden = true;
+
+    onUpdate(() => {
+      const camCenter = camPos();
+      if (position === "top") {
+        bg.pos = vec2(camCenter.x - width() / 2, camCenter.y - height() / 2);
+        txt.pos = vec2(
+          camCenter.x - txt.width / 2,
+          camCenter.y - height() / 2 + pad + textOffset
+        );
+      } else {
+        bg.pos = vec2(
+          camCenter.x - width() / 2,
+          camCenter.y + height() / 2 - h
+        );
+        txt.pos = vec2(
+          camCenter.x - txt.width / 2,
+          camCenter.y + height() / 2 - h + pad + textOffset
+        );
+      }
+    });
     return {
       say(t) {
         txt.text = t;
@@ -370,16 +485,51 @@ scene("elevator1", (levelIdx) => {
 
   for (const dir in dirs) {
     onKeyPress(dir, () => {
+      dialogTop.dismiss();
+      dialogBottom.dismiss();
       dialog.dismiss();
     });
     onKeyDown(dir, () => {
       player.move(dirs[dir].scale(SPEED));
     });
   }
+
+  const dialogTop = addDialog("top");
+  const dialogBottom = addDialog("bottom");
+
   player.onCollide("elevator", () => {
     dialog.say(
-      "Oh no !! The elevator is out of order !! How am I going to do ??"
+      "Oh non !! L'ascenseur est en panne !! Comment vais-je faire ??"
     );
+  });
+  player.onCollide("neighboor1", () => {
+    dialogTop.say(
+      "Ça sent la raclette ici. Xavier et Marie doivent se régaler mais ils ne pourront pas m'aider"
+    );
+  });
+  player.onCollide("neighboor2", () => {
+    dialogTop.say(
+      "J'entends Arthur hurler. Son garçon doit avoir fait une bêtise."
+    );
+  });
+  player.onCollide("neighboor3", () => {
+    dialogTop.say(
+      "C'est chez Cyrille ici. J'aimerais beaucoup aller boire un verre avec lui un de ces quatres"
+    );
+  });
+  player.onCollide("neighboor4", () => {
+    dialogBottom.say(
+      "SORTEZ D'ICI !! Leo va commencer à nous raconter des blagues et nous serons forcément en retard"
+    );
+  });
+  player.onCollide("neighboor5", () => {
+    dialogBottom.say(
+      "Du Metal à fond.. Heuresement qu'Ileano déménage bientôt."
+    );
+  });
+
+  player.onCollide("exit", () => {
+    go("maze", 0);
   });
 });
 
