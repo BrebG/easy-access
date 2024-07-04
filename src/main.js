@@ -30,7 +30,11 @@ loadSprite("car2", "sprites/voiture2.png");
 loadSprite("metal", "sprites/metal.png");
 loadSprite("grass", "sprites/grass.png");
 loadSprite("road", "sprites/road.jpg");
-loadSprite("pedestrian", "sprites/bean.png")
+loadSprite("pedestrian", "sprites/man.png");
+loadSprite("parkPath", "sprites/path.jpg");
+loadSprite("panneau", "sprites/panneau.png");
+loadSprite("parquet", "sprites/parquet.png");
+loadSprite("box", "sprites/box.png");
 
 scene("flat", () => {
 	const levels = [
@@ -260,7 +264,7 @@ scene("flat", () => {
 	});
 
 	player.onCollide("door", () => {
-		go("car");
+		go("elevator1");
 	});
 
 	// Toggle light
@@ -314,7 +318,7 @@ function createPedestrian(x, y) {
 function spawnFirstCar() {
 	add([
 		sprite("car"),
-		pos(0, 280),
+		pos(width("100vw") - 1700, height("100vh") - 580),
 		area(),
 		body(),
 		move(carDirection, carSpeed),
@@ -325,7 +329,7 @@ function spawnFirstCar() {
 function spawnSecondCar() {
 	add([
 		sprite("car2"),
-		pos(1920, 380),
+		pos(width("100vw") - 500, height("100vh") - 480),
 		area(),
 		body(),
 		move(vec2(-1, 0), carSpeed),
@@ -336,7 +340,7 @@ function spawnSecondCar() {
 function spawnThirdCar() {
 	add([
 		sprite("car"),
-		pos(0, 480),
+		pos(0, 420),
 		area(),
 		body(),
 		move(carDirection, carSpeed),
@@ -347,7 +351,7 @@ function spawnThirdCar() {
 function spawnFourthCar() {
 	add([
 		sprite("car"),
-		pos(0, 580),
+		pos(0, 480),
 		area(),
 		body(),
 		move(carDirection, carSpeed),
@@ -393,14 +397,20 @@ scene("car", () => {
 		player.use(sprite("heroUp", { width: 40, height: 64 }));
 		player.move(0, -SPEED);
 	});
-	const metal = add([sprite("metal"), pos(width("100vw") - 200, (height("100vh") - 200)), area(), body(), "metal"]);
 
-	player.onCollide("metal", () => {
+	add([
+		sprite("parkPath", { width: 300, height: 200 }),
+		pos(width("100vw") - 0, height("100vh") - 140),
+		rotate(45),
+		area(),
+		"parkPath",
+	]);
+
+	player.onCollide("parkPath", () => {
 		go("park");
 	});
 
 	player.onCollide("car", () => {
-		burp();
 		addKaboom(player.pos);
 		go("car");
 	});
@@ -425,7 +435,7 @@ scene("car", () => {
 scene("park", () => {
 	add([sprite("grass", { width: width("100vw"), height: height("100vh") })]);
 
-	loop(1, () => {
+	loop(0.5, () => {
 		createPedestrian(rand(0, width()), rand(0, height()));
 	});
 
@@ -458,12 +468,12 @@ scene("park", () => {
 		player.use(sprite("heroUp", { width: 40, height: 64 }));
 		player.move(0, -SPEED);
 	});
-	const metal = add([
-		sprite("metal"),
-		pos(1750, 90),
+	add([
+		sprite("panneau", { width: 86, height: 64 }),
+		pos(width() - 100, 700),
 		area(),
 		body({ isStatic: true }),
-		"metal",
+		"panneau",
 	]);
 
 	player.onCollideUpdate("pedestrian", () => {
@@ -471,11 +481,11 @@ scene("park", () => {
 	});
 
 	player.onCollideEnd("pedestrian", () => {
-		SPEED = 480;
+		SPEED = 250;
 	});
 
-	player.onCollide("metal", () => {
-		go("car");
+	player.onCollide("panneau", () => {
+		go("office");
 	});
 
 	onKeyDown("left", () => {
@@ -502,21 +512,21 @@ scene("office", () => {
 
 	const levels = [
 
-		"pxxxxxxpxxxxxxxxxp",
-		"p______p_________p",
-		"p______p_________p",
-		"p______p_________p",
-		"p______p_________p",
-		"pxx_xxxx_________p",
-		"p________________p",
-		"p________________p",
-		"p________________p",
-		"p________________p",
-		"p________________p",
-		"p________________p",
-		"p________________p",
-		"p________________p",
-		"xxx|xxxxxxxxxxxxxx",
+		"xxxxxxxx",
+		"________",
+		"________",
+		"________",
+		"________",
+		"xxx_xxxx",
+		"________",
+		"________",
+		"________",
+		"________",
+		"________",
+		"________",
+		"________",
+		"________",
+		"xxx|xxxx",
 
 	];
 
@@ -555,7 +565,7 @@ scene("office", () => {
 
 	const player = add([
 		sprite("heroDown", { width: 48, height: 64 }),
-		pos(100, 100),
+		pos(140, 790),
 		area(),
 		body(),
 		z(5),
@@ -731,6 +741,359 @@ scene("office", () => {
 })
 
 
+scene("maze", () => {
+	add([sprite("parquet", { width: 1400, height: 900 })]);
+	addLevel(
+		[
+			"yyyyyyyyyyyyyyyyyyyyyyy",
+			"y     y   H     y y y y",
+			"y yyyyyyy yyyyy y y y y",
+			"y       H y y   H     y",
+			"yyyyyyyyy y yyyyyyyyyHy",
+			"y           y         y",
+			"yHyyyyyyyyyyy yyyyyyyyy",
+			"y y   y   y     y   y y",
+			"y yyyyyyy y yyy  yyyy y",
+			"y y        Hy   y     y",
+			"D yyyyyyyyy yyy y yyyyy",
+			"y y   y   y y   y   y y",
+			"y yyy y yyy yyy yyy y y",
+			"y           y   H     y",
+			"yyyyyyyyyyyyyyyyyyyyyyy",
+		],
+
+		{
+			tileWidth: 64,
+			tileHeight: 64,
+			tiles: {
+				y: () => [
+					sprite("brickWall", { width: 64, height: 64 }),
+					area(),
+					body({ isStatic: true }),
+					anchor("center"),
+				],
+				D: () => [
+					sprite("door", { width: 64, height: 64 }),
+					area(),
+					body({ isStatic: true }),
+					anchor("center"),
+					"door",
+				],
+				H: () => [
+					sprite("box", { width: 64, height: 64 }),
+					area(),
+					body({ isStatic: false }),
+					anchor("center"),
+					"box",
+				],
+			},
+		}
+	);
+
+	const player = add([
+		sprite("heroDown", { width: 48, height: 50 }),
+		pos(1300, 480),
+		area(),
+		body(),
+		"player",
+	]);
+
+	player.onUpdate(() => {
+		camPos(player.pos);
+	});
+
+	loadSprite("heroUp", "/sprites/heroUp.png");
+	loadSprite("heroRight", "/sprites/heroRight.png");
+	loadSprite("heroLeft", "/sprites/heroLeft.png");
+	loadSprite("heroDown", "/sprites/heroDown.png");
+
+	onKeyDown("right", () => {
+		player.use(sprite("heroRight", { width: 40, height: 62 }));
+		player.move(SPEED, 0);
+	});
+
+	onKeyDown("left", () => {
+		player.use(sprite("heroLeft", { width: 40, height: 62 }));
+		player.move(-SPEED, 0);
+	});
+
+	onKeyDown("down", () => {
+		player.use(sprite("heroDown", { width: 40, height: 62 }));
+		player.move(0, SPEED);
+	});
+
+	onKeyDown("up", () => {
+		player.use(sprite("heroUp", { width: 40, height: 62 }));
+		player.move(0, -SPEED);
+	});
+	player.onCollide("door", () => {
+		go("car");
+	})
+});
+
+scene("elevator1", () => {
+	addLevel(
+		[
+			"xx1xx2xxx3xxxxxx",
+			"x______________x",
+			"W______________x",
+			"W______________x",
+			"x______________x",
+			"xExxx4xxx5xxxxxx",
+		],
+		{
+			tileWidth: 64,
+			tileHeight: 64,
+			pos: vec2(480, 250),
+
+			tiles: {
+				x: () => [
+					sprite("brickWall", { width: 64, height: 64 }),
+					area(),
+					body({ isStatic: true }),
+					anchor("center"),
+				],
+				// _: () => [
+				// 	sprite("carrelage", { width: 64, height: 64 }),
+				// 	area(),
+				// 	anchor("center"),
+				// ],
+				E: () => [
+					sprite("metal", { width: 64, height: 64 }),
+					area(),
+					body({ isStatic: true }),
+					anchor("center"),
+					"metal",
+				],
+				1: () => [
+					sprite("metal", { width: 64, height: 64 }),
+					area(),
+					body({ isStatic: true }),
+					anchor("center"),
+					"neighboor1",
+				],
+				2: () => [
+					sprite("metal", { width: 64, height: 64 }),
+					area(),
+					body({ isStatic: true }),
+					anchor("center"),
+					"neighboor2",
+				],
+				3: () => [
+					sprite("metal", { width: 64, height: 64 }),
+					area(),
+					body({ isStatic: true }),
+					anchor("center"),
+					"neighboor3",
+				],
+				4: () => [
+					sprite("metal", { width: 64, height: 64 }),
+					area(),
+					body({ isStatic: true }),
+					anchor("center"),
+					"neighboor4",
+				],
+				5: () => [
+					sprite("metal", { width: 64, height: 64 }),
+					area(),
+					body({ isStatic: true }),
+					anchor("center"),
+					"neighboor5",
+				],
+				W: () => [
+					sprite("window", { width: 64, height: 64 }),
+					area(),
+					rotate(90),
+					body({ isStatic: true }),
+					anchor("center"),
+				],
+			},
+		}
+	);
+
+	const plantDeco1 = add([
+		sprite("plantDeco", { width: 64, height: 64 }),
+		pos(670, 280),
+		area(),
+		body({ isActive: true }),
+		"plantDeco",
+	]);
+
+	const plantDeco2 = add([
+		sprite("plantDeco", { width: 64, height: 64 }),
+		pos(930, 280),
+		area(),
+		body({ isActive: true }),
+		"plantDeco",
+	]);
+
+	const plantDeco3 = add([
+		sprite("plantDeco", { width: 64, height: 64 }),
+		pos(930, 500),
+		area(),
+		body({ isActive: true }),
+		"plantDeco",
+	]);
+
+	const plantDeco4 = add([
+		sprite("plantDeco", { width: 64, height: 64 }),
+		pos(600, 500),
+		area(),
+		body({ isActive: true }),
+		"plantDeco",
+	]);
+	loadSprite("carpet", "/sprites/carpet.png");
+
+	const carpet = add([
+		sprite("carpet", { width: 126, height: 126 }),
+		pos(800, 350),
+		area(),
+		"carpet",
+	]);
+
+	const elevator = add([
+		sprite("metal", { width: 260, height: 160 }),
+		pos(1450, 280),
+		area(),
+		body({ isActive: true }),
+		rotate(90),
+		"metal",
+	]);
+
+	const player = add([
+		sprite("heroDown", { width: 38, height: 64 }),
+		pos(600, 350),
+		area(),
+		body(),
+		"player",
+	]);
+	player.onUpdate(() => {
+		camPos(player.pos);
+	});
+
+	const dirs = {
+		left: LEFT,
+		right: RIGHT,
+		up: UP,
+		down: DOWN,
+	};
+
+	function addDialog(position) {
+		const h = 220;
+		const pad = 16;
+		const textOffset = 80;
+		const bg = add([
+			pos(width() / 4, height() - h),
+			rect(width(), h),
+			color(0, 0, 0),
+			z(100),
+		]);
+		const txt = add([
+			text("", {
+				width: width() / 2 - 2 * pad,
+			}),
+			pos(width() / 2.5 + pad, height() - h + pad),
+			z(100),
+		]);
+		bg.hidden = true;
+		txt.hidden = true;
+
+		onUpdate(() => {
+			const camCenter = camPos();
+			if (position === "top") {
+				bg.pos = vec2(camCenter.x - width() / 2, camCenter.y - height() / 2);
+				txt.pos = vec2(
+					camCenter.x - txt.width / 2,
+					camCenter.y - height() / 2 + pad + textOffset
+				);
+			} else {
+				bg.pos = vec2(
+					camCenter.x - width() / 2,
+					camCenter.y + height() / 2 - h
+				);
+				txt.pos = vec2(
+					camCenter.x - txt.width / 2,
+					camCenter.y + height() / 2 - h + pad + textOffset
+				);
+			}
+		});
+		return {
+			say(t) {
+				txt.text = t;
+				bg.hidden = false;
+				txt.hidden = false;
+			},
+			dismiss() {
+				if (!this.active()) {
+					return;
+				}
+				txt.text = "";
+				bg.hidden = true;
+				txt.hidden = true;
+			},
+			active() {
+				return !bg.hidden;
+			},
+			destroy() {
+				bg.destroy();
+				txt.destroy();
+			},
+		};
+	}
+
+	const dialog = addDialog();
+
+	for (const dir in dirs) {
+		onKeyPress(dir, () => {
+			dialogTop.dismiss();
+			dialogBottom.dismiss();
+			dialog.dismiss();
+		});
+		onKeyDown(dir, () => {
+			player.move(dirs[dir].scale(SPEED));
+		});
+	}
+
+	const dialogTop = addDialog("top");
+	const dialogBottom = addDialog("bottom");
+
+	player.onCollide("metal", () => {
+		dialog.say(
+			"Oh non !! L'ascenseur est en panne !! Comment vais-je faire ??"
+		);
+	});
+	player.onCollide("neighboor1", () => {
+		dialogTop.say(
+			"Ça sent la raclette ici. Xavier et Marie doivent se régaler mais ils ne pourront pas m'aider"
+		);
+	});
+	player.onCollide("neighboor2", () => {
+		dialogTop.say(
+			"J'entends Arthur hurler. Son garçon doit avoir fait une bêtise."
+		);
+	});
+	player.onCollide("neighboor3", () => {
+		dialogTop.say(
+			"C'est chez Cyrille ici. J'aimerais beaucoup aller boire un verre avec lui un de ces quatres"
+		);
+	});
+	player.onCollide("neighboor4", () => {
+		dialogBottom.say(
+			"SORTEZ D'ICI !! Leo va commencer à nous raconter des blagues et nous serons forcément en retard"
+		);
+	});
+	player.onCollide("neighboor5", () => {
+		dialogBottom.say(
+			"Du Metal à fond.. Heuresement qu'Ileano déménage bientôt."
+		);
+	});
+
+	player.onCollide("metal", () => {
+		go("maze", 0);
+	});
+});
+
+
 scene("start", () => {
 	onUpdate(() => setCursor("default"));
 
@@ -760,7 +1123,7 @@ scene("start", () => {
 
 	const startButton = addButton("Start", vec2(width() / 2, height() / 2));
 
-	startButton.onClick(() => go("office"));
+	startButton.onClick(() => go("flat"));
 });
 
 go("start");
