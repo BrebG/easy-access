@@ -1,199 +1,194 @@
 import kaboom from "kaboom";
 
 // Initialize Kaboom
-kaboom();
+kaboom({ background: [0, 0, 0] });
 
 // Constants
 const SPEED = 320;
 
 // Load assets
+loadSprite("bed", "/sprites/bed.png");
+loadSprite("table", "/sprites/table.png");
+loadSprite("closet", "/sprites/closet.png");
+loadSprite("door", "/sprites/door.png");
+loadSprite("doorOpen", "/sprites/doorOpen.png");
+loadSprite("kitchen", "/sprites/kitchen.png");
+loadSprite("tableFlower", "/sprites/tableFlower.png");
+loadSprite("plantDeco", "/sprites/plantDeco.png");
+loadSprite("windowDouble", "/sprites/windowDouble.png");
+loadSprite("window", "/sprites/window.png");
+loadSprite("clockWide", "/sprites/clockWide.png");
 loadSprite("heroRight", "/sprites/heroRight.png");
 loadSprite("heroLeft", "/sprites/heroLeft.png");
 loadSprite("heroDown", "/sprites/heroDown.png");
 loadSprite("heroUp", "/sprites/heroUp.png");
 loadSprite("light_switch", "https://kaboomjs.com/sprites/coin.png");
 loadSprite("bg", "/sprites/parquet.png");
-add([
-  sprite("bg", { width: width("100vw"), height: height("100vh") }), // Redimensionner le sprite pour qu'il couvre tout l'écran
-]);
-loadSprite("metal", "/sprites/metal.png", {
-  sliceX: 2,
-  sliceY: 2,
-});
+loadSprite("brickWall", "/sprites/brickWall.jpg");
 
-const levels = [
-  "===============",
-  "=          =  =",
-  "=             =",
-  "=             =",
-  "=   =         =",
-  "=             =",
-
-  "===============",
-];
-
-const tileWidth = 64;
-const tileHeight = 64;
-const levelWidth = levels[0].length * tileWidth;
-const levelHeight = levels.length * tileHeight;
-const posX = (width() - levelWidth) / 2;
-const posY = (height() - levelHeight) / 2;
-
-const level = addLevel(levels, {
-  tileWidth: tileWidth,
-  tileHeight: tileHeight,
-  pos: vec2(posX, posY),
-
-  tiles: {
-    "=": () => [
-      sprite("metal"),
-      area(),
-      body({ isStatic: true }),
-      anchor("center"),
+scene("flat", (levelIdx) => {
+  const levels = [
+    [
+      "xxxxxxxxxx",
+      "x___x____x",
+      "x___x____x",
+      "x___x____x",
+      "xx_xx____x",
+      "x________x",
+      "x________x",
+      "x________x",
+      "xx|xxxxxxx",
     ],
-  },
-});
+  ];
 
-// Game state
-let isLightOn = true;
-let canToggleLight = false;
-let canTakeElevator = false;
-let blackScreen = null;
+  const level = addLevel(levels[levelIdx], {
+    tileWidth: 64,
+    tileHeight: 64,
+    pos: vec2(0, 0),
 
-function addDialog() {
-  const h = 160;
-  const pad = 16;
-  const bg = add([
-    pos(0, height() - h),
-    rect(width(), h),
-    color(0, 0, 0),
-    z(100),
-  ]);
-  const txt = add([
-    text("", {
-      width: width(),
-    }),
-    pos(0 + pad, height() - h + pad),
-    z(100),
-  ]);
-  bg.hidden = true;
-  txt.hidden = true;
-  return {
-    say(t) {
-      txt.text = t;
-      bg.hidden = false;
-      txt.hidden = false;
+    tiles: {
+      x: () => [
+        sprite("brickWall", { width: 64, height: 64 }),
+        area(),
+        body({ isStatic: true }),
+        anchor("center"),
+      ],
+      _: () => [
+        sprite("bg", { width: 64, height: 64 }),
+        area(),
+        anchor("center"),
+      ],
+      "|": () => [
+        sprite("door", { width: 64, height: 64 }),
+        area(),
+        body({ isStatic: true }),
+        anchor("center"),
+      ],
     },
-    dismiss() {
-      if (!this.active()) {
-        return;
-      }
-      txt.text = "";
-      bg.hidden = true;
-      txt.hidden = true;
-    },
-    active() {
-      return !bg.hidden;
-    },
-    destroy() {
-      bg.destroy();
-      txt.destroy();
-    },
+  });
+
+  // Game state
+  let isLightOn = true;
+  let canToggleLight = false;
+  let canTakeElevator = false;
+  let blackScreen = null;
+
+  function addDialog() {
+    const h = 340;
+    const pad = 16;
+    const bg = add([
+      pos(0, height() - h),
+      rect(width(), h),
+      color(0, 0, 0),
+      z(100),
+    ]);
+    const txt = add([
+      text("", {
+        width: width(),
+      }),
+      pos(0 + pad, height() - h + pad),
+      z(100),
+    ]);
+    bg.hidden = true;
+    txt.hidden = true;
+    return {
+      say(t) {
+        txt.text = t;
+        bg.hidden = false;
+        txt.hidden = false;
+      },
+      dismiss() {
+        if (!this.active()) {
+          return;
+        }
+        txt.text = "";
+        bg.hidden = true;
+        txt.hidden = true;
+      },
+      active() {
+        return !bg.hidden;
+      },
+      destroy() {
+        bg.destroy();
+        txt.destroy();
+      },
+    };
+  }
+  const dirs = {
+    left: LEFT,
+    right: RIGHT,
+    up: UP,
+    down: DOWN,
   };
-}
-const dirs = {
-  left: LEFT,
-  right: RIGHT,
-  up: UP,
-  down: DOWN,
-};
 
-// Player
+  // Player
 
-const player = add([
-  sprite("heroDown", { width: 64, height: 100 }),
-  pos(500, 350),
-  area(),
-  body(),
-  "player",
-]);
+  const player = add([
+    sprite("heroDown", { width: 64, height: 100 }),
+    pos(500, 350),
+    area(),
+    body(),
+    "player",
+  ]);
 
-loadSprite("heroUp", "/sprites/heroUp.png");
-loadSprite("heroRight", "/sprites/heroRight.png");
-loadSprite("heroLeft", "/sprites/heroLeft.png");
-loadSprite("heroDown", "/sprites/heroDown.png");
+  loadSprite("heroUp", "/sprites/heroUp.png");
+  loadSprite("heroRight", "/sprites/heroRight.png");
+  loadSprite("heroLeft", "/sprites/heroLeft.png");
+  loadSprite("heroDown", "/sprites/heroDown.png");
 
-onKeyDown("right", () => {
-  player.use(sprite("heroRight", { width: 64, height: 100 }));
-  player.move(SPEED, 0);
-});
+  onKeyDown("right", () => {
+    player.use(sprite("heroRight", { width: 64, height: 100 }));
+    player.move(SPEED, 0);
+  });
 
-onKeyDown("left", () => {
-  player.use(sprite("heroLeft", { width: 64, height: 100 }));
-  player.move(-SPEED, 0);
-});
+  onKeyDown("left", () => {
+    player.use(sprite("heroLeft", { width: 64, height: 100 }));
+    player.move(-SPEED, 0);
+  });
 
-onKeyDown("down", () => {
-  player.use(sprite("heroDown", { width: 64, height: 100 }));
-  player.move(0, SPEED);
-});
+  onKeyDown("down", () => {
+    player.use(sprite("heroDown", { width: 64, height: 100 }));
+    player.move(0, SPEED);
+  });
 
-onKeyDown("up", () => {
-  player.use(sprite("heroUp", { width: 64, height: 100 }));
-  player.move(0, -SPEED);
-});
+  onKeyDown("up", () => {
+    player.use(sprite("heroUp", { width: 64, height: 100 }));
+    player.move(0, -SPEED);
+  });
 
-// Player collisions
-player.onCollide("elevatorOOS", () => {
-  dialog.say("The elevator is out of service, I should go find an other one.");
-});
+  // Player collisions interactions
+  player.onCollide("light_switch", () => {
+    dialog.say("You found a light switch ! Press 'E' to activate");
+    canToggleLight = true;
+  });
 
-player.onCollide("elevator", () => {
-  dialog.say("Would you like to use the elevator ? Press 'E' to accept");
-  canTakeElevator = true;
+  player.onCollideEnd("light_switch", () => {
+    canToggleLight = false;
+  });
+
+  player.onCollide("clockWide", () => {
+    dialog.say("It's 1.30pm");
+  });
+
+  // Toggle light
   onKeyPress("e", () => {
-    if (canTakeElevator) {
-      go("next_level", levelIdx + 1);
+    if (canToggleLight) {
+      if (isLightOn) {
+        isLightOn = false;
+        blackScreen = add([
+          rect(580, 480),
+          pos(0, 0),
+          color(0, 0, 0),
+          "black_screen",
+        ]);
+      } else {
+        isLightOn = true;
+        if (blackScreen) {
+          destroy(blackScreen);
+          blackScreen = null;
+        }
+      }
     }
   });
 });
-
-player.onCollideEnd("elevator", () => {
-  canTakeElevator = false;
-});
-
-player.onCollide("light_switch", () => {
-  dialog.say("You found a light switch ! Press 'E' to activate");
-  canToggleLight = true;
-});
-
-player.onCollideEnd("light_switch", () => {
-  canToggleLight = false;
-});
-
-player.onCollide("bus", () => {
-  dialog.say(
-    "Sorry Miss, the access ramp is out of service. The next bus should be here in 20 minutes."
-  );
-});
-
-// Toggle light
-onKeyPress("e", () => {
-  if (canToggleLight) {
-    if (isLightOn) {
-      isLightOn = false;
-      blackScreen = add([
-        rect(width(), height()),
-        pos(0, 0),
-        color(0, 0, 0),
-        "black_screen",
-      ]);
-    } else {
-      isLightOn = true;
-      if (blackScreen) {
-        destroy(blackScreen);
-        blackScreen = null;
-      }
-    }
-  }
-});
+go("flat", 0);
