@@ -1,4 +1,4 @@
-import kaboom from "kaboom"
+import kaboom from "kaboom";
 
 // Initialize Kaboom
 kaboom()
@@ -9,6 +9,47 @@ const SPEED = 320
 // Load assets
 loadSprite("bean", "/sprites/bean.png");
 loadSprite("light_switch", "https://kaboomjs.com/sprites/coin.png");
+
+
+loadSprite("metal", "/sprites/metal.png", {
+	sliceX: 2,
+	sliceY: 2,
+});
+
+const levels = [
+	"===============",
+	"=          =  =",
+	"=             =",
+	"=             =",
+	"=   =         =",
+	"=             =",
+	"=             =",
+	"=             =",
+	"=             =",
+	"===============",
+];
+const tileWidth = 64;
+const tileHeight = 64;
+const levelWidth = levels[0].length * tileWidth;
+const levelHeight = levels.length * tileHeight;
+const posX = (width() - levelWidth) / 2;
+const posY = (height() - levelHeight) / 2;
+
+const level = addLevel(levels, {
+	tileWidth: 64,
+	tileHeight: 64,
+	pos: vec2(posX, posY),
+
+	tiles: {
+		"=": () => [
+			sprite("metal"),
+			area(),
+			body({ isStatic: true }),
+			anchor("center"),
+		],
+	},
+});
+
 
 // Game state
 let isLightOn = true;
