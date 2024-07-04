@@ -108,7 +108,7 @@ const dirs = {
 // Player
 const player = add([
 	sprite("bean"),
-	pos(100, 200),
+	pos(160, 200),
 	area(),
 	body(),
 	"player",
@@ -117,7 +117,7 @@ const player = add([
 // Light switch
 const lightSwitch = add([
 	sprite("light_switch"),
-	pos(300, 100),
+	pos(400, 220),
 	area(),
 	"light_switch"
 ]);
