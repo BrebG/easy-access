@@ -275,3 +275,5 @@ scene("flat", (levelIdx) => {
   });
 });
 go("flat", 0);
+
+// Maze
