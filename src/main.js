@@ -516,7 +516,7 @@ scene("office", () => {
 		"p________________p",
 		"p________________p",
 		"p________________p",
-		"xx|xxxxxxxxxxxxxxx",
+		"xxx|xxxxxxxxxxxxxx",
 
 	];
 
@@ -558,25 +558,41 @@ scene("office", () => {
 		pos(100, 100),
 		area(),
 		body(),
+		z(5),
 		"player",
 	]);
 
+	loadSprite("boss", "/sprites/boss.png");
 
-	onKeyDown("left", () => {
-		player.move(-SPEED, 0);
-	});
+	const boss = add([
+		sprite("boss", { width: 38, height: 64 }),
+		pos(204, 50),
+		area(),
+		body(),
+		z(3),
+		"boss",
+	]);
 
 	onKeyDown("right", () => {
+		player.use(sprite("heroRight", { width: 48, height: 64 }));
 		player.move(SPEED, 0);
 	});
 
-	onKeyDown("up", () => {
-		player.move(0, -SPEED);
+	onKeyDown("left", () => {
+		player.use(sprite("heroLeft", { width: 48, height: 64 }));
+		player.move(-SPEED, 0);
 	});
 
 	onKeyDown("down", () => {
+		player.use(sprite("heroDown", { width: 40, height: 64 }));
 		player.move(0, SPEED);
 	});
+
+	onKeyDown("up", () => {
+		player.use(sprite("heroUp", { width: 40, height: 64 }));
+		player.move(0, -SPEED);
+	});
+
 
 	player.onUpdate(() => {
 		camPos(player.pos);
@@ -608,6 +624,7 @@ scene("office", () => {
 		pos(160, 80),
 		area(),
 		body({ isStatic: true }),
+		z(4),
 		"table",
 	]);
 
@@ -615,12 +632,102 @@ scene("office", () => {
 
 	const officeArmchair = add([
 		sprite("officeArmchair", { width: 64, height: 64 }),
-		pos(160, 30),
+		pos(190, 30),
 		area(),
-		body({ isStatic: true }),
+		z(2),
 		"officeArmchair",
 	]);
 
+	loadSprite("carpet", "/sprites/carpet.png");
+
+	const carpet = add([
+		sprite("carpet", { width: 148, height: 112 }),
+		pos(150, 90),
+		area(),
+		z(1),
+		"carpet",
+	]);
+
+	function addDialog() {
+		const h = 1000;
+		const pad = 16;
+		const bg = add([
+			pos(0, height() - h),
+			rect(450, 160),
+			color(0, 0, 0),
+			z(100),
+		]);
+		const txt = add([
+			text("", {
+				width: 450,
+				height: 160,
+			}),
+			pos(0 + pad, height() - h + pad),
+			z(100),
+		]);
+		bg.hidden = true;
+		txt.hidden = true;
+
+		let i = 0;
+		let texts = [];
+
+		onKeyPress("space", () => {
+			if (dialog.active() && i < texts.length - 1) {
+				i += 1;
+				txt.text = texts[i];
+			}
+		});
+
+		return {
+			setTexts(textArray) {
+				texts = textArray;
+				i = 0;
+			},
+			say() {
+				if (i < texts.length) {
+					txt.text = texts[i];
+					bg.hidden = false;
+					txt.hidden = false;
+				}
+			},
+			dismiss() {
+				if (!this.active()) {
+					return;
+				}
+				txt.text = "";
+				bg.hidden = true;
+				txt.hidden = true;
+				i = 0; // Reset i when dismissed
+			},
+			active() {
+				return !bg.hidden;
+			},
+			destroy() {
+				bg.destroy();
+				txt.destroy();
+			},
+		};
+	}
+
+	const dialog = addDialog();
+
+	// Set the array of texts
+	dialog.setTexts([
+		"Hello Miss Lagertha. I am glad to see that you made it in time.",
+		"We have a lot to discuss about the upcoming battle.",
+		"Our scouts have reported enemy movement in the nearby forest.",
+		"We must prepare our defenses and plan our strategy carefully.",
+	]);
+
+	// Trigger the dialog and display the first text
+	player.onCollideUpdate("carpet", () => {
+		dialog.say();
+	});
+
+	// Dismiss the dialog when the player leaves the carpet
+	player.onCollideEnd("carpet", () => {
+		dialog.dismiss();
+	});
 })
 
 
