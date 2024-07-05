@@ -11,6 +11,7 @@ loadSprite("bed", "/sprites/bed.png");
 loadSprite("table", "/sprites/table.png");
 loadSprite("closet", "/sprites/closet.png");
 loadSprite("door", "/sprites/door.png");
+loadSprite("exit", "/sprites/door.png");
 loadSprite("doorOpen", "/sprites/doorOpen.png");
 loadSprite("kitchen", "/sprites/kitchen.png");
 loadSprite("tableFlower", "/sprites/tableFlower.png");
@@ -34,8 +35,10 @@ loadSprite("pedestrian", "sprites/man.png");
 loadSprite("parkPath", "sprites/path.jpg");
 loadSprite("panneau", "sprites/panneau.png");
 loadSprite("parquet", "sprites/parquet.png");
+loadSprite("carpet", "sprites/carpet.png");
+loadSprite("carrelage", "sprites/carrelage.png");
+loadSprite("elevator", "sprites/elevator.png");
 loadSprite("box", "sprites/box.png");
-
 scene("flat", () => {
 	const levels = [
 
@@ -663,7 +666,7 @@ scene("office", () => {
 		const pad = 16;
 		const bg = add([
 			pos(0, height() - h),
-			rect(450, 160),
+			rect(450, 240),
 			color(0, 0, 0),
 			z(100),
 		]);
@@ -723,10 +726,15 @@ scene("office", () => {
 
 	// Set the array of texts
 	dialog.setTexts([
-		"Hello Miss Lagertha. I am glad to see that you made it in time.",
-		"We have a lot to discuss about the upcoming battle.",
-		"Our scouts have reported enemy movement in the nearby forest.",
-		"We must prepare our defenses and plan our strategy carefully.",
+		"José Hernandez : Bonjour Mme Lagertha.",
+		"Cécile Lagertha : Bonjour M Ernandez.",
+		"José Hernandez : Je suis ravi de voir que vous ayez pu être là à l'heure pour notre rendez-vous.",
+		"Cécile Lagertha : Je vous remercie pour l'oportunité que vous me proposez.",
+		"Bien que le délai ait été assez court je ne voulais pas manquer ce rendez-vous.",
+		"José Hernandez : Je crois savoir que vous habitez de l'autre côté du parc.",
+		"Cela n'a pas été trop une aventure pour vous rendre à nos bureaux ?",
+		"Cécile Lagertha : Une aventure, oui. Cela dit, en tant que personne à mobilité réduite depuis plusieurs années,",
+		"j'ai pris l'habitude de gérer ce genre de situations qui font partie de mon quotidien.",
 	]);
 
 	// Trigger the dialog and display the first text
@@ -737,6 +745,7 @@ scene("office", () => {
 	// Dismiss the dialog when the player leaves the carpet
 	player.onCollideEnd("carpet", () => {
 		dialog.dismiss();
+		go("end")
 	});
 })
 
@@ -831,6 +840,7 @@ scene("maze", () => {
 	})
 });
 
+
 scene("elevator1", () => {
 	addLevel(
 		[
@@ -853,48 +863,48 @@ scene("elevator1", () => {
 					body({ isStatic: true }),
 					anchor("center"),
 				],
-				// _: () => [
-				// 	sprite("carrelage", { width: 64, height: 64 }),
-				// 	area(),
-				// 	anchor("center"),
-				// ],
+				_: () => [
+					sprite("carrelage", { width: 64, height: 64 }),
+					area(),
+					anchor("center"),
+				],
 				E: () => [
-					sprite("metal", { width: 64, height: 64 }),
+					sprite("exit", { width: 64, height: 64 }),
 					area(),
 					body({ isStatic: true }),
 					anchor("center"),
-					"metal",
+					"exit",
 				],
 				1: () => [
-					sprite("metal", { width: 64, height: 64 }),
+					sprite("exit", { width: 64, height: 64 }),
 					area(),
 					body({ isStatic: true }),
 					anchor("center"),
 					"neighboor1",
 				],
 				2: () => [
-					sprite("metal", { width: 64, height: 64 }),
+					sprite("exit", { width: 64, height: 64 }),
 					area(),
 					body({ isStatic: true }),
 					anchor("center"),
 					"neighboor2",
 				],
 				3: () => [
-					sprite("metal", { width: 64, height: 64 }),
+					sprite("exit", { width: 64, height: 64 }),
 					area(),
 					body({ isStatic: true }),
 					anchor("center"),
 					"neighboor3",
 				],
 				4: () => [
-					sprite("metal", { width: 64, height: 64 }),
+					sprite("exit", { width: 64, height: 64 }),
 					area(),
 					body({ isStatic: true }),
 					anchor("center"),
 					"neighboor4",
 				],
 				5: () => [
-					sprite("metal", { width: 64, height: 64 }),
+					sprite("exit", { width: 64, height: 64 }),
 					area(),
 					body({ isStatic: true }),
 					anchor("center"),
@@ -910,7 +920,6 @@ scene("elevator1", () => {
 			},
 		}
 	);
-
 	const plantDeco1 = add([
 		sprite("plantDeco", { width: 64, height: 64 }),
 		pos(670, 280),
@@ -952,21 +961,41 @@ scene("elevator1", () => {
 	]);
 
 	const elevator = add([
-		sprite("metal", { width: 260, height: 160 }),
+		sprite("elevator", { width: 260, height: 160 }),
 		pos(1450, 280),
 		area(),
 		body({ isActive: true }),
 		rotate(90),
-		"metal",
+		"elevator",
 	]);
 
 	const player = add([
-		sprite("heroDown", { width: 38, height: 64 }),
+		sprite("heroDown", { width: 48, height: 64 }),
 		pos(600, 350),
 		area(),
 		body(),
 		"player",
 	]);
+
+	onKeyDown("right", () => {
+		player.use(sprite("heroRight", { width: 48, height: 64 }));
+		player.move(SPEED, 0);
+	});
+
+	onKeyDown("left", () => {
+		player.use(sprite("heroLeft", { width: 48, height: 64 }));
+		player.move(-SPEED, 0);
+	});
+
+	onKeyDown("down", () => {
+		player.use(sprite("heroDown", { width: 40, height: 64 }));
+		player.move(0, SPEED);
+	});
+
+	onKeyDown("up", () => {
+		player.use(sprite("heroUp", { width: 40, height: 64 }));
+		player.move(0, -SPEED);
+	});
 	player.onUpdate(() => {
 		camPos(player.pos);
 	});
@@ -1057,7 +1086,7 @@ scene("elevator1", () => {
 	const dialogTop = addDialog("top");
 	const dialogBottom = addDialog("bottom");
 
-	player.onCollide("metal", () => {
+	player.onCollide("elevator", () => {
 		dialog.say(
 			"Oh non !! L'ascenseur est en panne !! Comment vais-je faire ??"
 		);
@@ -1088,11 +1117,10 @@ scene("elevator1", () => {
 		);
 	});
 
-	player.onCollide("metal", () => {
+	player.onCollide("exit", () => {
 		go("maze", 0);
 	});
 });
-
 
 scene("start", () => {
 	onUpdate(() => setCursor("default"));
@@ -1124,6 +1152,119 @@ scene("start", () => {
 	const startButton = addButton("Start", vec2(width() / 2, height() / 2));
 
 	startButton.onClick(() => go("flat"));
+});
+scene("end", () => {
+	function addDialog() {
+		const h = 1000;
+		const pad = 16;
+		const bg = add([
+			pos(240, 80),
+			rect(450, 240),
+			color(0, 0, 0),
+			z(100),
+		]);
+		const txt = add([
+			text("", {
+				width: 450,
+				height: 160,
+			}),
+			pos(240, 80),
+			z(100),
+		]);
+		bg.hidden = true;
+		txt.hidden = true;
+
+		let i = 0;
+		let texts = [];
+
+		onKeyPress("space", () => {
+			if (dialog.active() && i < texts.length - 1) {
+				i += 1;
+				txt.text = texts[i];
+			}
+		});
+
+		return {
+			setTexts(textArray) {
+				texts = textArray;
+				i = 0;
+			},
+			say() {
+				if (i < texts.length) {
+					txt.text = texts[i];
+					bg.hidden = false;
+					txt.hidden = false;
+				}
+			},
+			dismiss() {
+				if (!this.active()) {
+					return;
+				}
+				txt.text = "";
+				bg.hidden = true;
+				txt.hidden = true;
+				i = 0; // Reset i when dismissed
+			},
+			active() {
+				return !bg.hidden;
+			},
+			destroy() {
+				bg.destroy();
+				txt.destroy();
+			},
+		};
+	}
+
+	const dialog = addDialog();
+
+	// Set the array of texts
+	dialog.setTexts([
+		"Merci d'avoir joué à notre jeu,",
+		"En plus des difficultés qui peuvent être rencontrées par les personnes à mobilité réduite (PMR) au quotidien pour évoluer en ville et simplement se déplacer.",
+		"Parmi les jeunes de 10 à 24 ans, 5 % déclarent être touchés par des déficiences et des limitations d’ordre moteur, sensoriel ou cognitif, pouvant les mettre en situation de handicap.",
+		"41 % d’entre eux déclarent avoir subi au cours de leur vie une discrimination à cause de leur état de santé ou d’un handicap.",
+		"C’est huit fois plus que chez les jeunes sans handicap.",
+		"Les jeunes atteints d’une déficience d’ordre cognitif se plaignent plutôt de mises à l’écart.",
+		"Les handicapés moteurs dont la scolarité a été perturbée ou interrompue pour des raisons de santé évoquent plus fréquemment des refus de droits.",
+		"À l’école, les jeunes ayant une déficience auditive ou visuelle déclarent plus souvent subir des injustices ou des refus de droit que les jeunes handicapés moteurs ; ces derniers sont plus fréquemment sujets à des moqueries ou des insultes.",
+		"Les adultes de 25 à 54 ans sont deux fois plus touchés par le handicap que les jeunes.Mais le handicap ou l’état de santé ne provoquent des discriminations que chez un quart d’entre eux.",
+		"Les chômeurs atteints d’une déficience sensorielle ou cognitive mentionnent fréquemment des injustices et refus de droits.Dans le cadre du travail, ce sont plutôt les handicapés moteurs qui déclarent avoir subi de telles discriminations.",
+		"Source : https://www.insee.fr/fr/statistiques/1280906"
+	]);
+
+
+
+
+
+	onUpdate(() => setCursor("default"));
+
+	function addButton(txt, p, f) {
+		const btn = add([
+			rect(240, 80, { radius: 8 }),
+			pos(p),
+			area(),
+			scale(1),
+			anchor("center"),
+			outline(4),
+		]);
+		btn.add([text(txt), anchor("center"), color(0, 0, 0)]);
+
+		btn.onHoverUpdate(() => {
+			const t = time() * 10;
+			btn.scale = vec2(1.2);
+			setCursor("pointer");
+		});
+		btn.onHoverEnd(() => {
+			btn.scale = vec2(1);
+			btn.color = rgb();
+		});
+
+		return btn;
+	}
+
+	const startButton = addButton("Start", vec2(width() / 2, height() / 2));
+
+	startButton.onClick(() => dialog.say());
 });
 
 go("start");
