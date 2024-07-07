@@ -11,6 +11,7 @@ loadSprite("bed", "/sprites/bed.png");
 loadSprite("table", "/sprites/table.png");
 loadSprite("closet", "/sprites/closet.png");
 loadSprite("door", "/sprites/door.png");
+loadSprite("exit", "/sprites/door.png");
 loadSprite("doorOpen", "/sprites/doorOpen.png");
 loadSprite("kitchen", "/sprites/kitchen.png");
 loadSprite("tableFlower", "/sprites/tableFlower.png");
@@ -30,10 +31,14 @@ loadSprite("car2", "sprites/voiture2.png");
 loadSprite("metal", "sprites/metal.png");
 loadSprite("grass", "sprites/grass.png");
 loadSprite("road", "sprites/road.jpg");
+loadSprite("pedestrian", "sprites/man.png");
+loadSprite("parkPath", "sprites/path.jpg");
+loadSprite("panneau", "sprites/panneau.png");
 loadSprite("parquet", "sprites/parquet.png");
-loadSprite("pedestrian", "sprites/bean.png");
+loadSprite("carpet", "sprites/carpet.png");
+loadSprite("carrelage", "sprites/carrelage.png");
+loadSprite("elevator", "sprites/elevator.png");
 loadSprite("box", "sprites/box.png");
-
 scene("flat", () => {
   const levels = [
     "xxxxxxxxxx",
@@ -314,7 +319,7 @@ function createPedestrian(x, y) {
 function spawnFirstCar() {
   add([
     sprite("car"),
-    pos(0, 280),
+    pos(width("100vw") - 1700, height("100vh") - 580),
     area(),
     body(),
     move(carDirection, carSpeed),
@@ -325,7 +330,7 @@ function spawnFirstCar() {
 function spawnSecondCar() {
   add([
     sprite("car2"),
-    pos(1920, 380),
+    pos(width("100vw") - 500, height("100vh") - 480),
     area(),
     body(),
     move(vec2(-1, 0), carSpeed),
@@ -336,7 +341,7 @@ function spawnSecondCar() {
 function spawnThirdCar() {
   add([
     sprite("car"),
-    pos(0, 480),
+    pos(0, 420),
     area(),
     body(),
     move(carDirection, carSpeed),
@@ -347,7 +352,7 @@ function spawnThirdCar() {
 function spawnFourthCar() {
   add([
     sprite("car"),
-    pos(0, 580),
+    pos(0, 480),
     area(),
     body(),
     move(carDirection, carSpeed),
@@ -393,20 +398,20 @@ scene("car", () => {
     player.use(sprite("heroUp", { width: 40, height: 64 }));
     player.move(0, -SPEED);
   });
-  const metal = add([
-    sprite("metal"),
-    pos(width("100vw") - 200, height("100vh") - 200),
+
+  add([
+    sprite("parkPath", { width: 300, height: 200 }),
+    pos(width("100vw") - 0, height("100vh") - 140),
+    rotate(45),
     area(),
-    body(),
-    "metal",
+    "parkPath",
   ]);
 
-  player.onCollide("metal", () => {
+  player.onCollide("parkPath", () => {
     go("park");
   });
 
   player.onCollide("car", () => {
-    burp();
     addKaboom(player.pos);
     go("car");
   });
@@ -431,7 +436,7 @@ scene("car", () => {
 scene("park", () => {
   add([sprite("grass", { width: width("100vw"), height: height("100vh") })]);
 
-  loop(1, () => {
+  loop(0.5, () => {
     createPedestrian(rand(0, width()), rand(0, height()));
   });
 
@@ -464,12 +469,12 @@ scene("park", () => {
     player.use(sprite("heroUp", { width: 40, height: 64 }));
     player.move(0, -SPEED);
   });
-  const metal = add([
-    sprite("metal"),
-    pos(1750, 90),
+  add([
+    sprite("panneau", { width: 86, height: 64 }),
+    pos(width() - 100, 700),
     area(),
     body({ isStatic: true }),
-    "metal",
+    "panneau",
   ]);
 
   player.onCollideUpdate("pedestrian", () => {
@@ -477,11 +482,11 @@ scene("park", () => {
   });
 
   player.onCollideEnd("pedestrian", () => {
-    SPEED = 480;
+    SPEED = 250;
   });
 
-  player.onCollide("metal", () => {
-    go("start");
+  player.onCollide("panneau", () => {
+    go("office");
   });
 
   onKeyDown("left", () => {
@@ -501,26 +506,262 @@ scene("park", () => {
   });
 });
 
+scene("office", () => {
+  loadSprite("officeWall", "/sprites/officeWall.png");
+  loadSprite("officeFloor", "/sprites/officeFloor.png");
+
+  const levels = [
+    "xxxxxxxx",
+    "________",
+    "________",
+    "________",
+    "________",
+    "xxx_xxxx",
+    "________",
+    "________",
+    "________",
+    "________",
+    "________",
+    "________",
+    "________",
+    "________",
+    "xxx|xxxx",
+  ];
+
+  const level = addLevel(levels, {
+    tileWidth: 64,
+    tileHeight: 64,
+    pos: vec2(0, 0),
+
+    tiles: {
+      x: () => [
+        sprite("officeWall", { width: 64, height: 64 }),
+        area(),
+        body({ isStatic: true }),
+        anchor("center"),
+      ],
+      p: () => [
+        sprite("brickWall", { width: 64, height: 64 }),
+        area(),
+        body({ isStatic: true }),
+        anchor("center"),
+      ],
+      _: () => [
+        sprite("officeFloor", { width: 64, height: 64 }),
+        area(),
+        anchor("center"),
+      ],
+      "|": () => [
+        sprite("door", { width: 64, height: 64 }),
+        area(),
+        body({ isStatic: true }),
+        anchor("center"),
+        "door",
+      ],
+    },
+  });
+
+  const player = add([
+    sprite("heroDown", { width: 48, height: 64 }),
+    pos(140, 790),
+    area(),
+    body(),
+    z(5),
+    "player",
+  ]);
+
+  loadSprite("boss", "/sprites/boss.png");
+
+  const boss = add([
+    sprite("boss", { width: 38, height: 64 }),
+    pos(204, 50),
+    area(),
+    body(),
+    z(3),
+    "boss",
+  ]);
+
+  onKeyDown("right", () => {
+    player.use(sprite("heroRight", { width: 48, height: 64 }));
+    player.move(SPEED, 0);
+  });
+
+  onKeyDown("left", () => {
+    player.use(sprite("heroLeft", { width: 48, height: 64 }));
+    player.move(-SPEED, 0);
+  });
+
+  onKeyDown("down", () => {
+    player.use(sprite("heroDown", { width: 40, height: 64 }));
+    player.move(0, SPEED);
+  });
+
+  onKeyDown("up", () => {
+    player.use(sprite("heroUp", { width: 40, height: 64 }));
+    player.move(0, -SPEED);
+  });
+
+  player.onUpdate(() => {
+    camPos(player.pos);
+  });
+
+  loadSprite("doorOpen", "/sprites/doorOpen.png");
+
+  const doorOpen = add([
+    sprite("doorOpen", { width: 64, height: 64 }),
+    pos(160, 290),
+    area(),
+    "doorOpen",
+  ]);
+
+  loadSprite("windowDouble", "/sprites/windowDouble.png");
+
+  const windowDouble = add([
+    sprite("windowDouble", { width: 140, height: 50 }),
+    pos(155, -35),
+    area(),
+    body({ isStatic: true }),
+    "windowDouble",
+  ]);
+
+  loadSprite("table", "/sprites/table.png");
+
+  const table = add([
+    sprite("table", { width: 128, height: 64 }),
+    pos(160, 80),
+    area(),
+    body({ isStatic: true }),
+    z(4),
+    "table",
+  ]);
+
+  loadSprite("officeArmchair", "/sprites/officeArmchair.png");
+
+  const officeArmchair = add([
+    sprite("officeArmchair", { width: 64, height: 64 }),
+    pos(190, 30),
+    area(),
+    z(2),
+    "officeArmchair",
+  ]);
+
+  loadSprite("carpet", "/sprites/carpet.png");
+
+  const carpet = add([
+    sprite("carpet", { width: 148, height: 112 }),
+    pos(150, 90),
+    area(),
+    z(1),
+    "carpet",
+  ]);
+
+  function addDialog() {
+    const h = 1000;
+    const pad = 16;
+    const bg = add([
+      pos(0, height() - h),
+      rect(450, 240),
+      color(0, 0, 0),
+      z(100),
+    ]);
+    const txt = add([
+      text("", {
+        width: 450,
+        height: 160,
+      }),
+      pos(0 + pad, height() - h + pad),
+      z(100),
+    ]);
+    bg.hidden = true;
+    txt.hidden = true;
+
+    let i = 0;
+    let texts = [];
+
+    onKeyPress("space", () => {
+      if (dialog.active() && i < texts.length - 1) {
+        i += 1;
+        txt.text = texts[i];
+      }
+    });
+
+    return {
+      setTexts(textArray) {
+        texts = textArray;
+        i = 0;
+      },
+      say() {
+        if (i < texts.length) {
+          txt.text = texts[i];
+          bg.hidden = false;
+          txt.hidden = false;
+        }
+      },
+      dismiss() {
+        if (!this.active()) {
+          return;
+        }
+        txt.text = "";
+        bg.hidden = true;
+        txt.hidden = true;
+        i = 0; // Reset i when dismissed
+      },
+      active() {
+        return !bg.hidden;
+      },
+      destroy() {
+        bg.destroy();
+        txt.destroy();
+      },
+    };
+  }
+
+  const dialog = addDialog();
+
+  // Set the array of texts
+  dialog.setTexts([
+    "José Hernandez : Bonjour Mme Lagertha.",
+    "Cécile Lagertha : Bonjour M Ernandez.",
+    "José Hernandez : Je suis ravi de voir que vous ayez pu être là à l'heure pour notre rendez-vous.",
+    "Cécile Lagertha : Je vous remercie pour l'oportunité que vous me proposez.",
+    "Bien que le délai ait été assez court je ne voulais pas manquer ce rendez-vous.",
+    "José Hernandez : Je crois savoir que vous habitez de l'autre côté du parc.",
+    "Cela n'a pas été trop une aventure pour vous rendre à nos bureaux ?",
+    "Cécile Lagertha : Une aventure, oui. Cela dit, en tant que personne à mobilité réduite depuis plusieurs années,",
+    "j'ai pris l'habitude de gérer ce genre de situations qui font partie de mon quotidien.",
+  ]);
+
+  // Trigger the dialog and display the first text
+  player.onCollideUpdate("carpet", () => {
+    dialog.say();
+  });
+
+  // Dismiss the dialog when the player leaves the carpet
+  player.onCollideEnd("carpet", () => {
+    dialog.dismiss();
+    go("end");
+  });
+});
+
 scene("maze", () => {
-  add([sprite("parquet", { width: width("100vw"), height: height("100vh") })]);
+  add([sprite("parquet", { width: 1400, height: 900 })]);
   addLevel(
     [
-      "                           ",
-      "    yyyyyyyyyyyyyyyyyyyyyyy",
-      "    y     y   H     y y y y",
-      "    y yyyyyyy yyyyy y y y y",
-      "    y       H y y   H     y",
-      "    yyyyyyyyy y yyyyyyyyyHy",
-      "    y           y         y",
-      "    yHyyyyyyyyyyy yyyyyyyyy",
-      "    y y   y   y     y   y D",
-      "    y yyyyyyy y yyy  yyyy y",
-      "    y y        Hy   y     y",
-      "    D yyyyyyyyy yyy y yyyyy",
-      "    y y   y   y y   y   y y",
-      "    y yyy y yyy yyy yyy y y",
-      "    y           y   H     y",
-      "    yyyyyyyyyyyyyyyyyyyyyyy",
+      "yyyyyyyyyyyyyyyyyyyyyyy",
+      "y     y   H     y y y y",
+      "y yyyyyyy yyyyy y y y y",
+      "y       H y y   H     y",
+      "yyyyyyyyy y yyyyyyyyyHy",
+      "y           y         y",
+      "yHyyyyyyyyyyy yyyyyyyyy",
+      "y y   y   y     y   y y",
+      "y yyyyyyy y yyy  yyyy y",
+      "y y        Hy   y     y",
+      "D yyyyyyyyy yyy y yyyyy",
+      "y y   y   y y   y   y y",
+      "y yyy y yyy yyy yyy y y",
+      "y           y   H     y",
+      "yyyyyyyyyyyyyyyyyyyyyyy",
     ],
 
     {
@@ -550,16 +791,18 @@ scene("maze", () => {
       },
     }
   );
-  // Playerconst levelWidth = levels[0].length * 64; // Largeur du niveau en pixels
-  // Hauteur du niveau en pixels
 
   const player = add([
     sprite("heroDown", { width: 48, height: 50 }),
-    pos(1580, 480),
+    pos(1300, 480),
     area(),
     body(),
     "player",
   ]);
+
+  player.onUpdate(() => {
+    camPos(player.pos);
+  });
 
   loadSprite("heroUp", "/sprites/heroUp.png");
   loadSprite("heroRight", "/sprites/heroRight.png");
@@ -585,46 +828,11 @@ scene("maze", () => {
     player.use(sprite("heroUp", { width: 40, height: 62 }));
     player.move(0, -SPEED);
   });
-  go("car");
+  player.onCollide("door", () => {
+    go("car");
+  });
 });
 
-scene("start", () => {
-  onUpdate(() => setCursor("default"));
-
-  function addButton(txt, p, f) {
-    const btn = add([
-      rect(240, 80, { radius: 8 }),
-      pos(p),
-      area(),
-      scale(1),
-      anchor("center"),
-      outline(4),
-    ]);
-    btn.add([text(txt), anchor("center"), color(0, 0, 0)]);
-
-    btn.onHoverUpdate(() => {
-      const t = time() * 10;
-      btn.scale = vec2(1.2);
-      setCursor("pointer");
-    });
-    btn.onHoverEnd(() => {
-      btn.scale = vec2(1);
-      btn.color = rgb();
-    });
-
-    return btn;
-  }
-
-  const startButton = addButton("Start", vec2(width() / 2, height() / 2));
-
-  startButton.onClick(() => go("flat"));
-});
-
-// Load assets
-loadSprite("carrelage", "/sprites/carrelage.png");
-loadSprite("carpet", "/sprites/carpet.png");
-
-// DEBUT DE LA SCENE ELEVATOR1
 scene("elevator1", () => {
   addLevel(
     [
@@ -653,42 +861,42 @@ scene("elevator1", () => {
           anchor("center"),
         ],
         E: () => [
-          sprite("metal", { width: 64, height: 64 }),
+          sprite("exit", { width: 64, height: 64 }),
           area(),
           body({ isStatic: true }),
           anchor("center"),
-          "metal",
+          "exit",
         ],
         1: () => [
-          sprite("metal", { width: 64, height: 64 }),
+          sprite("exit", { width: 64, height: 64 }),
           area(),
           body({ isStatic: true }),
           anchor("center"),
           "neighboor1",
         ],
         2: () => [
-          sprite("metal", { width: 64, height: 64 }),
+          sprite("exit", { width: 64, height: 64 }),
           area(),
           body({ isStatic: true }),
           anchor("center"),
           "neighboor2",
         ],
         3: () => [
-          sprite("metal", { width: 64, height: 64 }),
+          sprite("exit", { width: 64, height: 64 }),
           area(),
           body({ isStatic: true }),
           anchor("center"),
           "neighboor3",
         ],
         4: () => [
-          sprite("metal", { width: 64, height: 64 }),
+          sprite("exit", { width: 64, height: 64 }),
           area(),
           body({ isStatic: true }),
           anchor("center"),
           "neighboor4",
         ],
         5: () => [
-          sprite("metal", { width: 64, height: 64 }),
+          sprite("exit", { width: 64, height: 64 }),
           area(),
           body({ isStatic: true }),
           anchor("center"),
@@ -704,7 +912,6 @@ scene("elevator1", () => {
       },
     }
   );
-
   const plantDeco1 = add([
     sprite("plantDeco", { width: 64, height: 64 }),
     pos(670, 280),
@@ -736,6 +943,7 @@ scene("elevator1", () => {
     body({ isActive: true }),
     "plantDeco",
   ]);
+  loadSprite("carpet", "/sprites/carpet.png");
 
   const carpet = add([
     sprite("carpet", { width: 126, height: 126 }),
@@ -745,21 +953,41 @@ scene("elevator1", () => {
   ]);
 
   const elevator = add([
-    sprite("metal", { width: 260, height: 160 }),
+    sprite("elevator", { width: 260, height: 160 }),
     pos(1450, 280),
     area(),
     body({ isActive: true }),
     rotate(90),
-    "metal",
+    "elevator",
   ]);
 
   const player = add([
-    sprite("heroDown", { width: 38, height: 64 }),
+    sprite("heroDown", { width: 48, height: 64 }),
     pos(600, 350),
     area(),
     body(),
     "player",
   ]);
+
+  onKeyDown("right", () => {
+    player.use(sprite("heroRight", { width: 48, height: 64 }));
+    player.move(SPEED, 0);
+  });
+
+  onKeyDown("left", () => {
+    player.use(sprite("heroLeft", { width: 48, height: 64 }));
+    player.move(-SPEED, 0);
+  });
+
+  onKeyDown("down", () => {
+    player.use(sprite("heroDown", { width: 40, height: 64 }));
+    player.move(0, SPEED);
+  });
+
+  onKeyDown("up", () => {
+    player.use(sprite("heroUp", { width: 40, height: 64 }));
+    player.move(0, -SPEED);
+  });
   player.onUpdate(() => {
     camPos(player.pos);
   });
@@ -850,7 +1078,7 @@ scene("elevator1", () => {
   const dialogTop = addDialog("top");
   const dialogBottom = addDialog("bottom");
 
-  player.onCollide("metal", () => {
+  player.onCollide("elevator", () => {
     dialog.say(
       "Oh non !! L'ascenseur est en panne !! Comment vais-je faire ??"
     );
@@ -881,10 +1109,145 @@ scene("elevator1", () => {
     );
   });
 
-  player.onCollide("metal", () => {
+  player.onCollide("exit", () => {
     go("maze", 0);
   });
 });
-// FIN DE LA SCENE metal1
+
+scene("start", () => {
+  onUpdate(() => setCursor("default"));
+
+  function addButton(txt, p, f) {
+    const btn = add([
+      rect(240, 80, { radius: 8 }),
+      pos(p),
+      area(),
+      scale(1),
+      anchor("center"),
+      outline(4),
+    ]);
+    btn.add([text(txt), anchor("center"), color(0, 0, 0)]);
+
+    btn.onHoverUpdate(() => {
+      const t = time() * 10;
+      btn.scale = vec2(1.2);
+      setCursor("pointer");
+    });
+    btn.onHoverEnd(() => {
+      btn.scale = vec2(1);
+      btn.color = rgb();
+    });
+
+    return btn;
+  }
+
+  const startButton = addButton("Start", vec2(width() / 2, height() / 2));
+
+  startButton.onClick(() => go("flat"));
+});
+scene("end", () => {
+  function addDialog() {
+    const h = 1000;
+    const pad = 16;
+    const bg = add([pos(240, 80), rect(450, 240), color(0, 0, 0), z(100)]);
+    const txt = add([
+      text("", {
+        width: 450,
+        height: 160,
+      }),
+      pos(240, 80),
+      z(100),
+    ]);
+    bg.hidden = true;
+    txt.hidden = true;
+
+    let i = 0;
+    let texts = [];
+
+    onKeyPress("space", () => {
+      if (dialog.active() && i < texts.length - 1) {
+        i += 1;
+        txt.text = texts[i];
+      }
+    });
+
+    return {
+      setTexts(textArray) {
+        texts = textArray;
+        i = 0;
+      },
+      say() {
+        if (i < texts.length) {
+          txt.text = texts[i];
+          bg.hidden = false;
+          txt.hidden = false;
+        }
+      },
+      dismiss() {
+        if (!this.active()) {
+          return;
+        }
+        txt.text = "";
+        bg.hidden = true;
+        txt.hidden = true;
+        i = 0; // Reset i when dismissed
+      },
+      active() {
+        return !bg.hidden;
+      },
+      destroy() {
+        bg.destroy();
+        txt.destroy();
+      },
+    };
+  }
+
+  const dialog = addDialog();
+
+  // Set the array of texts
+  dialog.setTexts([
+    "Merci d'avoir joué à notre jeu,",
+    "En plus des difficultés qui peuvent être rencontrées par les personnes à mobilité réduite (PMR) au quotidien pour évoluer en ville et simplement se déplacer.",
+    "Parmi les jeunes de 10 à 24 ans, 5 % déclarent être touchés par des déficiences et des limitations d’ordre moteur, sensoriel ou cognitif, pouvant les mettre en situation de handicap.",
+    "41 % d’entre eux déclarent avoir subi au cours de leur vie une discrimination à cause de leur état de santé ou d’un handicap.",
+    "C’est huit fois plus que chez les jeunes sans handicap.",
+    "Les jeunes atteints d’une déficience d’ordre cognitif se plaignent plutôt de mises à l’écart.",
+    "Les handicapés moteurs dont la scolarité a été perturbée ou interrompue pour des raisons de santé évoquent plus fréquemment des refus de droits.",
+    "À l’école, les jeunes ayant une déficience auditive ou visuelle déclarent plus souvent subir des injustices ou des refus de droit que les jeunes handicapés moteurs ; ces derniers sont plus fréquemment sujets à des moqueries ou des insultes.",
+    "Les adultes de 25 à 54 ans sont deux fois plus touchés par le handicap que les jeunes.Mais le handicap ou l’état de santé ne provoquent des discriminations que chez un quart d’entre eux.",
+    "Les chômeurs atteints d’une déficience sensorielle ou cognitive mentionnent fréquemment des injustices et refus de droits.Dans le cadre du travail, ce sont plutôt les handicapés moteurs qui déclarent avoir subi de telles discriminations.",
+    "Source : https://www.insee.fr/fr/statistiques/1280906",
+  ]);
+
+  onUpdate(() => setCursor("default"));
+
+  function addButton(txt, p, f) {
+    const btn = add([
+      rect(240, 80, { radius: 8 }),
+      pos(p),
+      area(),
+      scale(1),
+      anchor("center"),
+      outline(4),
+    ]);
+    btn.add([text(txt), anchor("center"), color(0, 0, 0)]);
+
+    btn.onHoverUpdate(() => {
+      const t = time() * 10;
+      btn.scale = vec2(1.2);
+      setCursor("pointer");
+    });
+    btn.onHoverEnd(() => {
+      btn.scale = vec2(1);
+      btn.color = rgb();
+    });
+
+    return btn;
+  }
+
+  const startButton = addButton("Start", vec2(width() / 2, height() / 2));
+
+  startButton.onClick(() => dialog.say());
+});
 
 go("start");
