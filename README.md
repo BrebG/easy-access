@@ -12,7 +12,7 @@ EasyAccess propose une expérience immersive où les joueurs naviguent à traver
 
 ## 📜 Essayer notre jeu
 
-- [Jeu](https://romainroger.vercel.app)
+- [Jeu](https://easy-access-wcs.vercel.app)
 
 ## 🚀 Fonctionnalités
 
